@@ -73,14 +73,14 @@ cdef extern from "librsync.h" nogil:
         size_t block_len
 
         rs_long_t in_bytes        #   /**< Total bytes read from input. */
-        rs_long_t out_bytes     #     /**< Total bytes written to output. */
+        rs_long_t out_bytes     #     /**< Total bytes written to sigfile. */
 
         time_t start, end
     ctypedef struct rs_mdfour_t
     extern const int RS_MD4_SUM_LENGTH, RS_BLAKE2_SUM_LENGTH
     int  RS_MAX_STRONG_SUM_LENGTH
     ctypedef uint32_t rs_weak_sum_t
-    ctypedef unsigned char rs_strong_sum_t[RS_MAX_STRONG_SUM_LENGTH]
+    ctypedef unsigned char* rs_strong_sum_t
     void rs_mdfour(unsigned char *out, void *in_, size_t n)
     void rs_mdfour_begin(rs_mdfour_t *md)
     void rs_mdfour_update(rs_mdfour_t *md, void * in_void, size_t  n)
