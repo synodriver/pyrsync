@@ -110,7 +110,9 @@ cdef class Job:
         return self
 
     cdef inline rs_result iter(self, rs_buffers_t * buffer):
-        cdef rs_result result = rs_job_iter(self.job, buffer)
+        cdef rs_result result
+        with nogil:
+            result = rs_job_iter(self.job, buffer)
         return result
 
     cpdef inline Stats statistics(self):
@@ -167,7 +169,9 @@ cdef class Job:
         self.job = NULL
 
 cpdef inline tuple get_signature_args(rs_long_t old_fsize, rs_magic_number magic, size_t block_len, size_t strong_len):
-    cdef rs_result result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
+    cdef rs_result result
+    with nogil:
+        result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
     if result != RS_DONE:
         raise LibrsyncError(result)
     return magic, block_len, strong_len
@@ -184,7 +188,9 @@ cpdef inline signature(object input, object output, size_t strong_len, rs_magic_
     :param block_size: 
     :return: 
     """
-    cdef rs_job_t * c_job = rs_sig_begin(block_size, strong_len, sig_magic)
+    cdef rs_job_t * c_job
+    with nogil:
+        c_job = rs_sig_begin(block_size, strong_len, sig_magic)
     cdef Job job = Job.from_ptr(c_job)
     job.execute(input, output)
 
@@ -205,10 +211,12 @@ cpdef inline delta(object input, object sigfile, object output):
     try:
         job = Job.from_ptr(c_job)
         job.execute(sigfile)
-        result = rs_build_hash_table(sig)
+        with nogil:
+            result = rs_build_hash_table(sig)
         if result != RS_DONE:
             raise LibrsyncError(result)
-        c_job = rs_delta_begin(sig)
+        with nogil:
+            c_job = rs_delta_begin(sig)
         job = Job.from_ptr(c_job)
         return job.execute(input, output)
     finally:
@@ -252,8 +260,9 @@ cpdef inline patch(object input, object delta, object output):
     args.file= <PyObject *>input
     args.buffer = NULL
     args.len = 0
-
-    cdef rs_job_t * c_job = rs_patch_begin(read_cb, <void*>&args)
+    cdef rs_job_t * c_job
+    with nogil:
+        c_job = rs_patch_begin(read_cb, <void*>&args)
     cdef Job job = Job.from_ptr(c_job)
     try:
         job.execute(delta, output)

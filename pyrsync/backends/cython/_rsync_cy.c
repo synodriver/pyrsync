@@ -968,17 +968,17 @@ static const char *__pyx_f[] = {
   "pyrsync\\backends\\cython\\_rsync_cy.pyx",
   "type.pxd",
 };
-/* ForceInitThreads.proto */
-#ifndef __PYX_FORCE_INIT_THREADS
-  #define __PYX_FORCE_INIT_THREADS 0
-#endif
-
 /* NoFastGil.proto */
 #define __Pyx_PyGILState_Ensure PyGILState_Ensure
 #define __Pyx_PyGILState_Release PyGILState_Release
 #define __Pyx_FastGIL_Remember()
 #define __Pyx_FastGIL_Forget()
 #define __Pyx_FastGilFuncInit()
+
+/* ForceInitThreads.proto */
+#ifndef __PYX_FORCE_INIT_THREADS
+  #define __PYX_FORCE_INIT_THREADS 0
+#endif
 
 
 /*--- Type declarations ---*/
@@ -988,7 +988,7 @@ struct __pyx_opt_args_7pyrsync_8backends_6cython_9_rsync_cy_3Job_execute;
 struct __pyx_opt_args_7pyrsync_8backends_6cython_9_rsync_cy_signature;
 struct __pyx_t_7pyrsync_8backends_6cython_9_rsync_cy_input_args;
 
-/* "pyrsync/backends/cython/_rsync_cy.pyx":120
+/* "pyrsync/backends/cython/_rsync_cy.pyx":122
  *         return Stats.from_ptr(state)
  * 
  *     cpdef inline int execute(self, object input, object output = None) except -1:             # <<<<<<<<<<<<<<
@@ -1000,7 +1000,7 @@ struct __pyx_opt_args_7pyrsync_8backends_6cython_9_rsync_cy_3Job_execute {
   PyObject *output;
 };
 
-/* "pyrsync/backends/cython/_rsync_cy.pyx":175
+/* "pyrsync/backends/cython/_rsync_cy.pyx":179
  *     return magic, block_len, strong_len
  * 
  * cpdef inline signature(object input, object output, size_t strong_len, rs_magic_number sig_magic,             # <<<<<<<<<<<<<<
@@ -1012,7 +1012,7 @@ struct __pyx_opt_args_7pyrsync_8backends_6cython_9_rsync_cy_signature {
   size_t block_size;
 };
 
-/* "pyrsync/backends/cython/_rsync_cy.pyx":217
+/* "pyrsync/backends/cython/_rsync_cy.pyx":225
  *         rs_free_sumset(sig)
  * 
  * cdef struct input_args:             # <<<<<<<<<<<<<<
@@ -3258,8 +3258,8 @@ static CYTHON_INLINE struct __pyx_obj_7pyrsync_8backends_6cython_9_rsync_cy_Job 
  *         return self
  * 
  *     cdef inline rs_result iter(self, rs_buffers_t * buffer):             # <<<<<<<<<<<<<<
- *         cdef rs_result result = rs_job_iter(self.job, buffer)
- *         return result
+ *         cdef rs_result result
+ *         with nogil:
  */
 
 static CYTHON_INLINE rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_iter(struct __pyx_obj_7pyrsync_8backends_6cython_9_rsync_cy_Job *__pyx_v_self, rs_buffers_t *__pyx_v_buffer) {
@@ -3268,18 +3268,53 @@ static CYTHON_INLINE rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Jo
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("iter", 0);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":113
- * 
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":114
  *     cdef inline rs_result iter(self, rs_buffers_t * buffer):
- *         cdef rs_result result = rs_job_iter(self.job, buffer)             # <<<<<<<<<<<<<<
+ *         cdef rs_result result
+ *         with nogil:             # <<<<<<<<<<<<<<
+ *             result = rs_job_iter(self.job, buffer)
+ *         return result
+ */
+  {
+      #ifdef WITH_THREAD
+      PyThreadState *_save;
+      Py_UNBLOCK_THREADS
+      __Pyx_FastGIL_Remember();
+      #endif
+      /*try:*/ {
+
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":115
+ *         cdef rs_result result
+ *         with nogil:
+ *             result = rs_job_iter(self.job, buffer)             # <<<<<<<<<<<<<<
  *         return result
  * 
  */
-  __pyx_v_result = rs_job_iter(__pyx_v_self->job, __pyx_v_buffer);
+        __pyx_v_result = rs_job_iter(__pyx_v_self->job, __pyx_v_buffer);
+      }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":114
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":114
  *     cdef inline rs_result iter(self, rs_buffers_t * buffer):
- *         cdef rs_result result = rs_job_iter(self.job, buffer)
+ *         cdef rs_result result
+ *         with nogil:             # <<<<<<<<<<<<<<
+ *             result = rs_job_iter(self.job, buffer)
+ *         return result
+ */
+      /*finally:*/ {
+        /*normal exit:*/{
+          #ifdef WITH_THREAD
+          __Pyx_FastGIL_Forget();
+          Py_BLOCK_THREADS
+          #endif
+          goto __pyx_L5;
+        }
+        __pyx_L5:;
+      }
+  }
+
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":116
+ *         with nogil:
+ *             result = rs_job_iter(self.job, buffer)
  *         return result             # <<<<<<<<<<<<<<
  * 
  *     cpdef inline Stats statistics(self):
@@ -3291,8 +3326,8 @@ static CYTHON_INLINE rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Jo
  *         return self
  * 
  *     cdef inline rs_result iter(self, rs_buffers_t * buffer):             # <<<<<<<<<<<<<<
- *         cdef rs_result result = rs_job_iter(self.job, buffer)
- *         return result
+ *         cdef rs_result result
+ *         with nogil:
  */
 
   /* function exit code */
@@ -3301,7 +3336,7 @@ static CYTHON_INLINE rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Jo
   return __pyx_r;
 }
 
-/* "pyrsync/backends/cython/_rsync_cy.pyx":116
+/* "pyrsync/backends/cython/_rsync_cy.pyx":118
  *         return result
  * 
  *     cpdef inline Stats statistics(self):             # <<<<<<<<<<<<<<
@@ -3320,7 +3355,7 @@ static CYTHON_INLINE struct __pyx_obj_7pyrsync_8backends_6cython_9_rsync_cy_Stat
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("statistics", 0);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":117
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":119
  * 
  *     cpdef inline Stats statistics(self):
  *         cdef rs_stats_t * state = rs_job_statistics(self.job)             # <<<<<<<<<<<<<<
@@ -3329,7 +3364,7 @@ static CYTHON_INLINE struct __pyx_obj_7pyrsync_8backends_6cython_9_rsync_cy_Stat
  */
   __pyx_v_state = rs_job_statistics(__pyx_v_self->job);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":118
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":120
  *     cpdef inline Stats statistics(self):
  *         cdef rs_stats_t * state = rs_job_statistics(self.job)
  *         return Stats.from_ptr(state)             # <<<<<<<<<<<<<<
@@ -3337,13 +3372,13 @@ static CYTHON_INLINE struct __pyx_obj_7pyrsync_8backends_6cython_9_rsync_cy_Stat
  *     cpdef inline int execute(self, object input, object output = None) except -1:
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_1 = ((PyObject *)__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_5Stats_from_ptr(__pyx_v_state)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 118, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_5Stats_from_ptr(__pyx_v_state)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 120, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = ((struct __pyx_obj_7pyrsync_8backends_6cython_9_rsync_cy_Stats *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":116
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":118
  *         return result
  * 
  *     cpdef inline Stats statistics(self):             # <<<<<<<<<<<<<<
@@ -3385,7 +3420,7 @@ static PyObject *__pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_3Job_statistics(
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("statistics", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_statistics(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 116, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_statistics(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 118, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3402,7 +3437,7 @@ static PyObject *__pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_3Job_statistics(
   return __pyx_r;
 }
 
-/* "pyrsync/backends/cython/_rsync_cy.pyx":120
+/* "pyrsync/backends/cython/_rsync_cy.pyx":122
  *         return Stats.from_ptr(state)
  * 
  *     cpdef inline int execute(self, object input, object output = None) except -1:             # <<<<<<<<<<<<<<
@@ -3448,7 +3483,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
     }
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":121
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":123
  * 
  *     cpdef inline int execute(self, object input, object output = None) except -1:
  *         if not PyFile_Check(input):             # <<<<<<<<<<<<<<
@@ -3458,26 +3493,26 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
   __pyx_t_1 = ((!(__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_PyFile_Check(__pyx_v_input) != 0)) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":122
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":124
  *     cpdef inline int execute(self, object input, object output = None) except -1:
  *         if not PyFile_Check(input):
  *             raise TypeError("input except a file-like object, got %s" % type(input).__name__)             # <<<<<<<<<<<<<<
  *             return -1
  *         if output is not None and not PyFile_Check(output):
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)Py_TYPE(__pyx_v_input)), __pyx_n_s_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 122, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)Py_TYPE(__pyx_v_input)), __pyx_n_s_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 124, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_input_except_a_file_like_object, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 122, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_input_except_a_file_like_object, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 124, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_TypeError, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 122, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_TypeError, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 124, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(1, 122, __pyx_L1_error)
+    __PYX_ERR(1, 124, __pyx_L1_error)
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":121
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":123
  * 
  *     cpdef inline int execute(self, object input, object output = None) except -1:
  *         if not PyFile_Check(input):             # <<<<<<<<<<<<<<
@@ -3486,7 +3521,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":124
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":126
  *             raise TypeError("input except a file-like object, got %s" % type(input).__name__)
  *             return -1
  *         if output is not None and not PyFile_Check(output):             # <<<<<<<<<<<<<<
@@ -3505,26 +3540,26 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
   __pyx_L5_bool_binop_done:;
   if (unlikely(__pyx_t_1)) {
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":125
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":127
  *             return -1
  *         if output is not None and not PyFile_Check(output):
  *             raise TypeError("sigfile except a file-like object, got %s" % type(output).__name__)             # <<<<<<<<<<<<<<
  *             return -1
  *         cdef:
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)Py_TYPE(__pyx_v_output)), __pyx_n_s_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 125, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)Py_TYPE(__pyx_v_output)), __pyx_n_s_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_sigfile_except_a_file_like_objec, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 125, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_sigfile_except_a_file_like_objec, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_TypeError, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 125, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_TypeError, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(1, 125, __pyx_L1_error)
+    __PYX_ERR(1, 127, __pyx_L1_error)
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":124
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":126
  *             raise TypeError("input except a file-like object, got %s" % type(input).__name__)
  *             return -1
  *         if output is not None and not PyFile_Check(output):             # <<<<<<<<<<<<<<
@@ -3533,20 +3568,20 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":133
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":135
  *             rs_result result
  * 
  *         out = PyMem_Malloc(RS_JOB_BLOCKSIZE)             # <<<<<<<<<<<<<<
  *         if not out:
  *             raise
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_RS_JOB_BLOCKSIZE); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 133, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_RS_JOB_BLOCKSIZE); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 135, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_6 = __Pyx_PyInt_As_size_t(__pyx_t_2); if (unlikely((__pyx_t_6 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 133, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_size_t(__pyx_t_2); if (unlikely((__pyx_t_6 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 135, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_out = PyMem_Malloc(__pyx_t_6);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":134
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":136
  * 
  *         out = PyMem_Malloc(RS_JOB_BLOCKSIZE)
  *         if not out:             # <<<<<<<<<<<<<<
@@ -3556,16 +3591,16 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
   __pyx_t_1 = ((!(__pyx_v_out != 0)) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":135
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":137
  *         out = PyMem_Malloc(RS_JOB_BLOCKSIZE)
  *         if not out:
  *             raise             # <<<<<<<<<<<<<<
  *             return -1
  *         try:
  */
-    __Pyx_ReraiseException(); __PYX_ERR(1, 135, __pyx_L1_error)
+    __Pyx_ReraiseException(); __PYX_ERR(1, 137, __pyx_L1_error)
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":134
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":136
  * 
  *         out = PyMem_Malloc(RS_JOB_BLOCKSIZE)
  *         if not out:             # <<<<<<<<<<<<<<
@@ -3574,7 +3609,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":137
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":139
  *             raise
  *             return -1
  *         try:             # <<<<<<<<<<<<<<
@@ -3583,7 +3618,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
   /*try:*/ {
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":138
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":140
  *             return -1
  *         try:
  *             while True:             # <<<<<<<<<<<<<<
@@ -3592,16 +3627,16 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
     while (1) {
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":139
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":141
  *         try:
  *             while True:
  *                 block = input.read(RS_JOB_BLOCKSIZE)  # type: bytes             # <<<<<<<<<<<<<<
  *                 buffer.next_in = PyBytes_AS_STRING(block)
  *                 buffer.avail_in = <size_t> PyBytes_GET_SIZE(block)
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_input, __pyx_n_s_read); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 139, __pyx_L9_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_input, __pyx_n_s_read); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 141, __pyx_L9_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_RS_JOB_BLOCKSIZE); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 139, __pyx_L9_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_RS_JOB_BLOCKSIZE); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 141, __pyx_L9_error)
       __Pyx_GOTREF(__pyx_t_7);
       __pyx_t_8 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -3616,14 +3651,14 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
       __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_8, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_7);
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 139, __pyx_L9_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 141, __pyx_L9_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(1, 139, __pyx_L9_error)
+      if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(1, 141, __pyx_L9_error)
       __Pyx_XDECREF_SET(__pyx_v_block, ((PyObject*)__pyx_t_2));
       __pyx_t_2 = 0;
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":140
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":142
  *             while True:
  *                 block = input.read(RS_JOB_BLOCKSIZE)  # type: bytes
  *                 buffer.next_in = PyBytes_AS_STRING(block)             # <<<<<<<<<<<<<<
@@ -3632,7 +3667,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
       __pyx_v_buffer.next_in = PyBytes_AS_STRING(__pyx_v_block);
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":141
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":143
  *                 block = input.read(RS_JOB_BLOCKSIZE)  # type: bytes
  *                 buffer.next_in = PyBytes_AS_STRING(block)
  *                 buffer.avail_in = <size_t> PyBytes_GET_SIZE(block)             # <<<<<<<<<<<<<<
@@ -3641,7 +3676,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
       __pyx_v_buffer.avail_in = ((size_t)PyBytes_GET_SIZE(__pyx_v_block));
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":142
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":144
  *                 buffer.next_in = PyBytes_AS_STRING(block)
  *                 buffer.avail_in = <size_t> PyBytes_GET_SIZE(block)
  *                 buffer.eof_in = bool(block)             # <<<<<<<<<<<<<<
@@ -3651,7 +3686,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
       __pyx_t_1 = (__pyx_v_block != Py_None)&&(PyBytes_GET_SIZE(__pyx_v_block) != 0);
       __pyx_v_buffer.eof_in = (!(!__pyx_t_1));
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":143
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":145
  *                 buffer.avail_in = <size_t> PyBytes_GET_SIZE(block)
  *                 buffer.eof_in = bool(block)
  *                 buffer.next_out = <char *> out             # <<<<<<<<<<<<<<
@@ -3660,20 +3695,20 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
       __pyx_v_buffer.next_out = ((char *)__pyx_v_out);
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":144
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":146
  *                 buffer.eof_in = bool(block)
  *                 buffer.next_out = <char *> out
  *                 buffer.avail_out = <size_t> RS_JOB_BLOCKSIZE             # <<<<<<<<<<<<<<
  *                 result = self.iter(&buffer)
  *                 if output is not None:
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_RS_JOB_BLOCKSIZE); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 144, __pyx_L9_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_RS_JOB_BLOCKSIZE); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 146, __pyx_L9_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_6 = __Pyx_PyInt_As_size_t(__pyx_t_2); if (unlikely((__pyx_t_6 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 144, __pyx_L9_error)
+      __pyx_t_6 = __Pyx_PyInt_As_size_t(__pyx_t_2); if (unlikely((__pyx_t_6 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 146, __pyx_L9_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_buffer.avail_out = ((size_t)__pyx_t_6);
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":145
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":147
  *                 buffer.next_out = <char *> out
  *                 buffer.avail_out = <size_t> RS_JOB_BLOCKSIZE
  *                 result = self.iter(&buffer)             # <<<<<<<<<<<<<<
@@ -3682,7 +3717,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
       __pyx_v_result = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_iter(__pyx_v_self, (&__pyx_v_buffer));
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":146
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":148
  *                 buffer.avail_out = <size_t> RS_JOB_BLOCKSIZE
  *                 result = self.iter(&buffer)
  *                 if output is not None:             # <<<<<<<<<<<<<<
@@ -3693,34 +3728,34 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
       __pyx_t_5 = (__pyx_t_1 != 0);
       if (__pyx_t_5) {
 
-        /* "pyrsync/backends/cython/_rsync_cy.pyx":147
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":149
  *                 result = self.iter(&buffer)
  *                 if output is not None:
  *                     output.write(             # <<<<<<<<<<<<<<
  *                         PyBytes_FromStringAndSize(<char *> out, <Py_ssize_t> (RS_JOB_BLOCKSIZE - buffer.avail_out)))
  *                 if result == RS_DONE:
  */
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_output, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 147, __pyx_L9_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_output, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 149, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_3);
 
-        /* "pyrsync/backends/cython/_rsync_cy.pyx":148
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":150
  *                 if output is not None:
  *                     output.write(
  *                         PyBytes_FromStringAndSize(<char *> out, <Py_ssize_t> (RS_JOB_BLOCKSIZE - buffer.avail_out)))             # <<<<<<<<<<<<<<
  *                 if result == RS_DONE:
  *                     break
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_RS_JOB_BLOCKSIZE); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 148, __pyx_L9_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_RS_JOB_BLOCKSIZE); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 150, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_8 = __Pyx_PyInt_FromSize_t(__pyx_v_buffer.avail_out); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 148, __pyx_L9_error)
+        __pyx_t_8 = __Pyx_PyInt_FromSize_t(__pyx_v_buffer.avail_out); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 150, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_9 = PyNumber_Subtract(__pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 148, __pyx_L9_error)
+        __pyx_t_9 = PyNumber_Subtract(__pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 150, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __pyx_t_10 = __Pyx_PyIndex_AsSsize_t(__pyx_t_9); if (unlikely((__pyx_t_10 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 148, __pyx_L9_error)
+        __pyx_t_10 = __Pyx_PyIndex_AsSsize_t(__pyx_t_9); if (unlikely((__pyx_t_10 == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 150, __pyx_L9_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_9 = PyBytes_FromStringAndSize(((char *)__pyx_v_out), ((Py_ssize_t)__pyx_t_10)); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 148, __pyx_L9_error)
+        __pyx_t_9 = PyBytes_FromStringAndSize(((char *)__pyx_v_out), ((Py_ssize_t)__pyx_t_10)); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 150, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_9);
         __pyx_t_8 = NULL;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -3735,12 +3770,12 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
         __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_8, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_9);
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 147, __pyx_L9_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 149, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "pyrsync/backends/cython/_rsync_cy.pyx":146
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":148
  *                 buffer.avail_out = <size_t> RS_JOB_BLOCKSIZE
  *                 result = self.iter(&buffer)
  *                 if output is not None:             # <<<<<<<<<<<<<<
@@ -3749,7 +3784,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
       }
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":149
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":151
  *                     output.write(
  *                         PyBytes_FromStringAndSize(<char *> out, <Py_ssize_t> (RS_JOB_BLOCKSIZE - buffer.avail_out)))
  *                 if result == RS_DONE:             # <<<<<<<<<<<<<<
@@ -3759,7 +3794,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
       __pyx_t_5 = ((__pyx_v_result == RS_DONE) != 0);
       if (__pyx_t_5) {
 
-        /* "pyrsync/backends/cython/_rsync_cy.pyx":150
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":152
  *                         PyBytes_FromStringAndSize(<char *> out, <Py_ssize_t> (RS_JOB_BLOCKSIZE - buffer.avail_out)))
  *                 if result == RS_DONE:
  *                     break             # <<<<<<<<<<<<<<
@@ -3768,7 +3803,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
         goto __pyx_L12_break;
 
-        /* "pyrsync/backends/cython/_rsync_cy.pyx":149
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":151
  *                     output.write(
  *                         PyBytes_FromStringAndSize(<char *> out, <Py_ssize_t> (RS_JOB_BLOCKSIZE - buffer.avail_out)))
  *                 if result == RS_DONE:             # <<<<<<<<<<<<<<
@@ -3777,7 +3812,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
       }
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":151
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":153
  *                 if result == RS_DONE:
  *                     break
  *                 elif result != RS_BLOCKED:             # <<<<<<<<<<<<<<
@@ -3787,16 +3822,16 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
       __pyx_t_5 = ((__pyx_v_result != RS_BLOCKED) != 0);
       if (unlikely(__pyx_t_5)) {
 
-        /* "pyrsync/backends/cython/_rsync_cy.pyx":152
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":154
  *                     break
  *                 elif result != RS_BLOCKED:
  *                     raise LibrsyncError(result)             # <<<<<<<<<<<<<<
  *                     return -1
  *                 if buffer.avail_in > 0:
  */
-        __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_LibrsyncError); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 152, __pyx_L9_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_LibrsyncError); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 154, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_9 = __Pyx_PyInt_From_rs_result(__pyx_v_result); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 152, __pyx_L9_error)
+        __pyx_t_9 = __Pyx_PyInt_From_rs_result(__pyx_v_result); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 154, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_9);
         __pyx_t_8 = NULL;
         if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -3811,14 +3846,14 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
         __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_8, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_9);
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 152, __pyx_L9_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 154, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_Raise(__pyx_t_2, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __PYX_ERR(1, 152, __pyx_L9_error)
+        __PYX_ERR(1, 154, __pyx_L9_error)
 
-        /* "pyrsync/backends/cython/_rsync_cy.pyx":151
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":153
  *                 if result == RS_DONE:
  *                     break
  *                 elif result != RS_BLOCKED:             # <<<<<<<<<<<<<<
@@ -3827,7 +3862,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
  */
       }
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":154
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":156
  *                     raise LibrsyncError(result)
  *                     return -1
  *                 if buffer.avail_in > 0:             # <<<<<<<<<<<<<<
@@ -3837,16 +3872,16 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
       __pyx_t_5 = ((__pyx_v_buffer.avail_in > 0) != 0);
       if (__pyx_t_5) {
 
-        /* "pyrsync/backends/cython/_rsync_cy.pyx":159
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":161
  *                     # next read. It would be better to simply tack data to the end of
  *                     # this buffer, but that is very difficult in Python.
  *                     input.seek(input.tell() - buffer.avail_in)             # <<<<<<<<<<<<<<
  *         finally:
  *             PyMem_Free(out)
  */
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_input, __pyx_n_s_seek); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 159, __pyx_L9_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_input, __pyx_n_s_seek); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 161, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_input, __pyx_n_s_tell); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 159, __pyx_L9_error)
+        __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_input, __pyx_n_s_tell); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 161, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_8);
         __pyx_t_7 = NULL;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_8))) {
@@ -3860,12 +3895,12 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
         }
         __pyx_t_9 = (__pyx_t_7) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_7) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 159, __pyx_L9_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 161, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __pyx_t_8 = __Pyx_PyInt_FromSize_t(__pyx_v_buffer.avail_in); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 159, __pyx_L9_error)
+        __pyx_t_8 = __Pyx_PyInt_FromSize_t(__pyx_v_buffer.avail_in); if (unlikely(!__pyx_t_8)) __PYX_ERR(1, 161, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_7 = PyNumber_Subtract(__pyx_t_9, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 159, __pyx_L9_error)
+        __pyx_t_7 = PyNumber_Subtract(__pyx_t_9, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 161, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -3882,12 +3917,12 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
         __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_8, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_7);
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 159, __pyx_L9_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 161, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "pyrsync/backends/cython/_rsync_cy.pyx":154
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":156
  *                     raise LibrsyncError(result)
  *                     return -1
  *                 if buffer.avail_in > 0:             # <<<<<<<<<<<<<<
@@ -3899,7 +3934,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
     __pyx_L12_break:;
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":161
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":163
  *                     input.seek(input.tell() - buffer.avail_in)
  *         finally:
  *             PyMem_Free(out)             # <<<<<<<<<<<<<<
@@ -3950,7 +3985,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
     __pyx_L10:;
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":162
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":164
  *         finally:
  *             PyMem_Free(out)
  *         return 0             # <<<<<<<<<<<<<<
@@ -3960,7 +3995,7 @@ static CYTHON_INLINE int __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_exec
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":120
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":122
  *         return Stats.from_ptr(state)
  * 
  *     cpdef inline int execute(self, object input, object output = None) except -1:             # <<<<<<<<<<<<<<
@@ -4023,7 +4058,7 @@ static PyObject *__pyx_pw_7pyrsync_8backends_6cython_9_rsync_cy_3Job_3execute(Py
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "execute") < 0)) __PYX_ERR(1, 120, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "execute") < 0)) __PYX_ERR(1, 122, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -4039,7 +4074,7 @@ static PyObject *__pyx_pw_7pyrsync_8backends_6cython_9_rsync_cy_3Job_3execute(Py
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("execute", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 120, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("execute", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 122, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pyrsync.backends.cython._rsync_cy.Job.execute", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4065,8 +4100,8 @@ static PyObject *__pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_3Job_2execute(st
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2.__pyx_n = 1;
   __pyx_t_2.output = __pyx_v_output;
-  __pyx_t_1 = __pyx_vtabptr_7pyrsync_8backends_6cython_9_rsync_cy_Job->execute(__pyx_v_self, __pyx_v_input, 1, &__pyx_t_2); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(1, 120, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 120, __pyx_L1_error)
+  __pyx_t_1 = __pyx_vtabptr_7pyrsync_8backends_6cython_9_rsync_cy_Job->execute(__pyx_v_self, __pyx_v_input, 1, &__pyx_t_2); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(1, 122, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 122, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
@@ -4083,7 +4118,7 @@ static PyObject *__pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_3Job_2execute(st
   return __pyx_r;
 }
 
-/* "pyrsync/backends/cython/_rsync_cy.pyx":164
+/* "pyrsync/backends/cython/_rsync_cy.pyx":166
  *         return 0
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -4107,7 +4142,7 @@ static void __pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_3Job_4__dealloc__(str
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":165
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":167
  * 
  *     def __dealloc__(self):
  *         if self.job:             # <<<<<<<<<<<<<<
@@ -4117,7 +4152,7 @@ static void __pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_3Job_4__dealloc__(str
   __pyx_t_1 = (__pyx_v_self->job != 0);
   if (__pyx_t_1) {
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":166
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":168
  *     def __dealloc__(self):
  *         if self.job:
  *             rs_job_free(self.job)             # <<<<<<<<<<<<<<
@@ -4126,7 +4161,7 @@ static void __pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_3Job_4__dealloc__(str
  */
     (void)(rs_job_free(__pyx_v_self->job));
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":165
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":167
  * 
  *     def __dealloc__(self):
  *         if self.job:             # <<<<<<<<<<<<<<
@@ -4135,7 +4170,7 @@ static void __pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_3Job_4__dealloc__(str
  */
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":167
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":169
  *         if self.job:
  *             rs_job_free(self.job)
  *         self.job = NULL             # <<<<<<<<<<<<<<
@@ -4144,7 +4179,7 @@ static void __pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_3Job_4__dealloc__(str
  */
   __pyx_v_self->job = NULL;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":164
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":166
  *         return 0
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -4271,12 +4306,12 @@ static PyObject *__pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_3Job_8__setstate
   return __pyx_r;
 }
 
-/* "pyrsync/backends/cython/_rsync_cy.pyx":169
+/* "pyrsync/backends/cython/_rsync_cy.pyx":171
  *         self.job = NULL
  * 
  * cpdef inline tuple get_signature_args(rs_long_t old_fsize, rs_magic_number magic, size_t block_len, size_t strong_len):             # <<<<<<<<<<<<<<
- *     cdef rs_result result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
- *     if result != RS_DONE:
+ *     cdef rs_result result
+ *     with nogil:
  */
 
 static PyObject *__pyx_pw_7pyrsync_8backends_6cython_9_rsync_cy_1get_signature_args(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
@@ -4294,18 +4329,53 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_get
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_signature_args", 0);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":170
- * 
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":173
  * cpdef inline tuple get_signature_args(rs_long_t old_fsize, rs_magic_number magic, size_t block_len, size_t strong_len):
- *     cdef rs_result result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)             # <<<<<<<<<<<<<<
+ *     cdef rs_result result
+ *     with nogil:             # <<<<<<<<<<<<<<
+ *         result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
+ *     if result != RS_DONE:
+ */
+  {
+      #ifdef WITH_THREAD
+      PyThreadState *_save;
+      Py_UNBLOCK_THREADS
+      __Pyx_FastGIL_Remember();
+      #endif
+      /*try:*/ {
+
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":174
+ *     cdef rs_result result
+ *     with nogil:
+ *         result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)             # <<<<<<<<<<<<<<
  *     if result != RS_DONE:
  *         raise LibrsyncError(result)
  */
-  __pyx_v_result = rs_sig_args(__pyx_v_old_fsize, (&__pyx_v_magic), (&__pyx_v_block_len), (&__pyx_v_strong_len));
+        __pyx_v_result = rs_sig_args(__pyx_v_old_fsize, (&__pyx_v_magic), (&__pyx_v_block_len), (&__pyx_v_strong_len));
+      }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":171
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":173
  * cpdef inline tuple get_signature_args(rs_long_t old_fsize, rs_magic_number magic, size_t block_len, size_t strong_len):
- *     cdef rs_result result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
+ *     cdef rs_result result
+ *     with nogil:             # <<<<<<<<<<<<<<
+ *         result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
+ *     if result != RS_DONE:
+ */
+      /*finally:*/ {
+        /*normal exit:*/{
+          #ifdef WITH_THREAD
+          __Pyx_FastGIL_Forget();
+          Py_BLOCK_THREADS
+          #endif
+          goto __pyx_L5;
+        }
+        __pyx_L5:;
+      }
+  }
+
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":175
+ *     with nogil:
+ *         result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
  *     if result != RS_DONE:             # <<<<<<<<<<<<<<
  *         raise LibrsyncError(result)
  *     return magic, block_len, strong_len
@@ -4313,16 +4383,16 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_get
   __pyx_t_1 = ((__pyx_v_result != RS_DONE) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":172
- *     cdef rs_result result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":176
+ *         result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
  *     if result != RS_DONE:
  *         raise LibrsyncError(result)             # <<<<<<<<<<<<<<
  *     return magic, block_len, strong_len
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_LibrsyncError); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 172, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_LibrsyncError); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyInt_From_rs_result(__pyx_v_result); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 172, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_rs_result(__pyx_v_result); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -4337,23 +4407,23 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_get
     __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 172, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(1, 172, __pyx_L1_error)
+    __PYX_ERR(1, 176, __pyx_L1_error)
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":171
- * cpdef inline tuple get_signature_args(rs_long_t old_fsize, rs_magic_number magic, size_t block_len, size_t strong_len):
- *     cdef rs_result result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":175
+ *     with nogil:
+ *         result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
  *     if result != RS_DONE:             # <<<<<<<<<<<<<<
  *         raise LibrsyncError(result)
  *     return magic, block_len, strong_len
  */
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":173
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":177
  *     if result != RS_DONE:
  *         raise LibrsyncError(result)
  *     return magic, block_len, strong_len             # <<<<<<<<<<<<<<
@@ -4361,13 +4431,13 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_get
  * cpdef inline signature(object input, object output, size_t strong_len, rs_magic_number sig_magic,
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyInt_From_rs_magic_number(__pyx_v_magic); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 173, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_rs_magic_number(__pyx_v_magic); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 177, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_block_len); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 173, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_block_len); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 177, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_FromSize_t(__pyx_v_strong_len); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 173, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_FromSize_t(__pyx_v_strong_len); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 177, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 173, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 177, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2);
@@ -4382,12 +4452,12 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_get
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":169
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":171
  *         self.job = NULL
  * 
  * cpdef inline tuple get_signature_args(rs_long_t old_fsize, rs_magic_number magic, size_t block_len, size_t strong_len):             # <<<<<<<<<<<<<<
- *     cdef rs_result result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
- *     if result != RS_DONE:
+ *     cdef rs_result result
+ *     with nogil:
  */
 
   /* function exit code */
@@ -4445,23 +4515,23 @@ static PyObject *__pyx_pw_7pyrsync_8backends_6cython_9_rsync_cy_1get_signature_a
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_magic)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("get_signature_args", 1, 4, 4, 1); __PYX_ERR(1, 169, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("get_signature_args", 1, 4, 4, 1); __PYX_ERR(1, 171, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_block_len)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("get_signature_args", 1, 4, 4, 2); __PYX_ERR(1, 169, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("get_signature_args", 1, 4, 4, 2); __PYX_ERR(1, 171, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_strong_len)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("get_signature_args", 1, 4, 4, 3); __PYX_ERR(1, 169, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("get_signature_args", 1, 4, 4, 3); __PYX_ERR(1, 171, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get_signature_args") < 0)) __PYX_ERR(1, 169, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get_signature_args") < 0)) __PYX_ERR(1, 171, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -4471,14 +4541,14 @@ static PyObject *__pyx_pw_7pyrsync_8backends_6cython_9_rsync_cy_1get_signature_a
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
     }
-    __pyx_v_old_fsize = __Pyx_PyInt_As_intmax_t(values[0]); if (unlikely((__pyx_v_old_fsize == ((rs_long_t)-1)) && PyErr_Occurred())) __PYX_ERR(1, 169, __pyx_L3_error)
-    __pyx_v_magic = ((rs_magic_number)__Pyx_PyInt_As_rs_magic_number(values[1])); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 169, __pyx_L3_error)
-    __pyx_v_block_len = __Pyx_PyInt_As_size_t(values[2]); if (unlikely((__pyx_v_block_len == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 169, __pyx_L3_error)
-    __pyx_v_strong_len = __Pyx_PyInt_As_size_t(values[3]); if (unlikely((__pyx_v_strong_len == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 169, __pyx_L3_error)
+    __pyx_v_old_fsize = __Pyx_PyInt_As_intmax_t(values[0]); if (unlikely((__pyx_v_old_fsize == ((rs_long_t)-1)) && PyErr_Occurred())) __PYX_ERR(1, 171, __pyx_L3_error)
+    __pyx_v_magic = ((rs_magic_number)__Pyx_PyInt_As_rs_magic_number(values[1])); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 171, __pyx_L3_error)
+    __pyx_v_block_len = __Pyx_PyInt_As_size_t(values[2]); if (unlikely((__pyx_v_block_len == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 171, __pyx_L3_error)
+    __pyx_v_strong_len = __Pyx_PyInt_As_size_t(values[3]); if (unlikely((__pyx_v_strong_len == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 171, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_signature_args", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 169, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("get_signature_args", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 171, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pyrsync.backends.cython._rsync_cy.get_signature_args", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4500,7 +4570,7 @@ static PyObject *__pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_get_signature_ar
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_signature_args", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_get_signature_args(__pyx_v_old_fsize, __pyx_v_magic, __pyx_v_block_len, __pyx_v_strong_len, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 169, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_get_signature_args(__pyx_v_old_fsize, __pyx_v_magic, __pyx_v_block_len, __pyx_v_strong_len, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 171, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4517,7 +4587,7 @@ static PyObject *__pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_get_signature_ar
   return __pyx_r;
 }
 
-/* "pyrsync/backends/cython/_rsync_cy.pyx":175
+/* "pyrsync/backends/cython/_rsync_cy.pyx":179
  *     return magic, block_len, strong_len
  * 
  * cpdef inline signature(object input, object output, size_t strong_len, rs_magic_number sig_magic,             # <<<<<<<<<<<<<<
@@ -4545,29 +4615,64 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_sig
     }
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":187
- *     :return:
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":192
  *     """
- *     cdef rs_job_t * c_job = rs_sig_begin(block_size, strong_len, sig_magic)             # <<<<<<<<<<<<<<
+ *     cdef rs_job_t * c_job
+ *     with nogil:             # <<<<<<<<<<<<<<
+ *         c_job = rs_sig_begin(block_size, strong_len, sig_magic)
+ *     cdef Job job = Job.from_ptr(c_job)
+ */
+  {
+      #ifdef WITH_THREAD
+      PyThreadState *_save;
+      Py_UNBLOCK_THREADS
+      __Pyx_FastGIL_Remember();
+      #endif
+      /*try:*/ {
+
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":193
+ *     cdef rs_job_t * c_job
+ *     with nogil:
+ *         c_job = rs_sig_begin(block_size, strong_len, sig_magic)             # <<<<<<<<<<<<<<
  *     cdef Job job = Job.from_ptr(c_job)
  *     job.execute(input, output)
  */
-  __pyx_v_c_job = rs_sig_begin(__pyx_v_block_size, __pyx_v_strong_len, __pyx_v_sig_magic);
+        __pyx_v_c_job = rs_sig_begin(__pyx_v_block_size, __pyx_v_strong_len, __pyx_v_sig_magic);
+      }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":188
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":192
  *     """
- *     cdef rs_job_t * c_job = rs_sig_begin(block_size, strong_len, sig_magic)
+ *     cdef rs_job_t * c_job
+ *     with nogil:             # <<<<<<<<<<<<<<
+ *         c_job = rs_sig_begin(block_size, strong_len, sig_magic)
+ *     cdef Job job = Job.from_ptr(c_job)
+ */
+      /*finally:*/ {
+        /*normal exit:*/{
+          #ifdef WITH_THREAD
+          __Pyx_FastGIL_Forget();
+          Py_BLOCK_THREADS
+          #endif
+          goto __pyx_L5;
+        }
+        __pyx_L5:;
+      }
+  }
+
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":194
+ *     with nogil:
+ *         c_job = rs_sig_begin(block_size, strong_len, sig_magic)
  *     cdef Job job = Job.from_ptr(c_job)             # <<<<<<<<<<<<<<
  *     job.execute(input, output)
  * 
  */
-  __pyx_t_1 = ((PyObject *)__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_from_ptr(__pyx_v_c_job)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 188, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_from_ptr(__pyx_v_c_job)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 194, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_job = ((struct __pyx_obj_7pyrsync_8backends_6cython_9_rsync_cy_Job *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":189
- *     cdef rs_job_t * c_job = rs_sig_begin(block_size, strong_len, sig_magic)
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":195
+ *         c_job = rs_sig_begin(block_size, strong_len, sig_magic)
  *     cdef Job job = Job.from_ptr(c_job)
  *     job.execute(input, output)             # <<<<<<<<<<<<<<
  * 
@@ -4575,9 +4680,9 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_sig
  */
   __pyx_t_3.__pyx_n = 1;
   __pyx_t_3.output = __pyx_v_output;
-  __pyx_t_2 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_execute(__pyx_v_job, __pyx_v_input, 0, &__pyx_t_3); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(1, 189, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_execute(__pyx_v_job, __pyx_v_input, 0, &__pyx_t_3); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(1, 195, __pyx_L1_error)
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":175
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":179
  *     return magic, block_len, strong_len
  * 
  * cpdef inline signature(object input, object output, size_t strong_len, rs_magic_number sig_magic,             # <<<<<<<<<<<<<<
@@ -4643,19 +4748,19 @@ static PyObject *__pyx_pw_7pyrsync_8backends_6cython_9_rsync_cy_3signature(PyObj
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_output)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("signature", 0, 4, 5, 1); __PYX_ERR(1, 175, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("signature", 0, 4, 5, 1); __PYX_ERR(1, 179, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_strong_len)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("signature", 0, 4, 5, 2); __PYX_ERR(1, 175, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("signature", 0, 4, 5, 2); __PYX_ERR(1, 179, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sig_magic)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("signature", 0, 4, 5, 3); __PYX_ERR(1, 175, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("signature", 0, 4, 5, 3); __PYX_ERR(1, 179, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
@@ -4665,7 +4770,7 @@ static PyObject *__pyx_pw_7pyrsync_8backends_6cython_9_rsync_cy_3signature(PyObj
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "signature") < 0)) __PYX_ERR(1, 175, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "signature") < 0)) __PYX_ERR(1, 179, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -4681,17 +4786,17 @@ static PyObject *__pyx_pw_7pyrsync_8backends_6cython_9_rsync_cy_3signature(PyObj
     }
     __pyx_v_input = values[0];
     __pyx_v_output = values[1];
-    __pyx_v_strong_len = __Pyx_PyInt_As_size_t(values[2]); if (unlikely((__pyx_v_strong_len == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 175, __pyx_L3_error)
-    __pyx_v_sig_magic = ((rs_magic_number)__Pyx_PyInt_As_rs_magic_number(values[3])); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 175, __pyx_L3_error)
+    __pyx_v_strong_len = __Pyx_PyInt_As_size_t(values[2]); if (unlikely((__pyx_v_strong_len == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 179, __pyx_L3_error)
+    __pyx_v_sig_magic = ((rs_magic_number)__Pyx_PyInt_As_rs_magic_number(values[3])); if (unlikely(PyErr_Occurred())) __PYX_ERR(1, 179, __pyx_L3_error)
     if (values[4]) {
-      __pyx_v_block_size = __Pyx_PyInt_As_size_t(values[4]); if (unlikely((__pyx_v_block_size == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 176, __pyx_L3_error)
+      __pyx_v_block_size = __Pyx_PyInt_As_size_t(values[4]); if (unlikely((__pyx_v_block_size == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(1, 180, __pyx_L3_error)
     } else {
       __pyx_v_block_size = __pyx_k__5;
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("signature", 0, 4, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 175, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("signature", 0, 4, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 179, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pyrsync.backends.cython._rsync_cy.signature", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4716,7 +4821,7 @@ static PyObject *__pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_2signature(CYTHO
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2.__pyx_n = 1;
   __pyx_t_2.block_size = __pyx_v_block_size;
-  __pyx_t_1 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_signature(__pyx_v_input, __pyx_v_output, __pyx_v_strong_len, __pyx_v_sig_magic, 0, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 175, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_signature(__pyx_v_input, __pyx_v_output, __pyx_v_strong_len, __pyx_v_sig_magic, 0, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 179, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4733,7 +4838,7 @@ static PyObject *__pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_2signature(CYTHO
   return __pyx_r;
 }
 
-/* "pyrsync/backends/cython/_rsync_cy.pyx":191
+/* "pyrsync/backends/cython/_rsync_cy.pyx":197
  *     job.execute(input, output)
  * 
  * cpdef inline delta(object input, object sigfile, object output):             # <<<<<<<<<<<<<<
@@ -4769,7 +4874,7 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_del
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("delta", 0);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":202
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":208
  *     cdef:
  *         rs_signature_t* sig
  *         rs_job_t * c_job = rs_loadsig_begin(&sig)             # <<<<<<<<<<<<<<
@@ -4778,7 +4883,7 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_del
  */
   __pyx_v_c_job = rs_loadsig_begin((&__pyx_v_sig));
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":205
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":211
  *         Job job
  *         rs_result result
  *     try:             # <<<<<<<<<<<<<<
@@ -4787,56 +4892,91 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_del
  */
   /*try:*/ {
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":206
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":212
  *         rs_result result
  *     try:
  *         job = Job.from_ptr(c_job)             # <<<<<<<<<<<<<<
  *         job.execute(sigfile)
- *         result = rs_build_hash_table(sig)
+ *         with nogil:
  */
-    __pyx_t_1 = ((PyObject *)__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_from_ptr(__pyx_v_c_job)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 206, __pyx_L4_error)
+    __pyx_t_1 = ((PyObject *)__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_from_ptr(__pyx_v_c_job)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 212, __pyx_L4_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_v_job = ((struct __pyx_obj_7pyrsync_8backends_6cython_9_rsync_cy_Job *)__pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":207
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":213
  *     try:
  *         job = Job.from_ptr(c_job)
  *         job.execute(sigfile)             # <<<<<<<<<<<<<<
- *         result = rs_build_hash_table(sig)
- *         if result != RS_DONE:
+ *         with nogil:
+ *             result = rs_build_hash_table(sig)
  */
-    __pyx_t_2 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_execute(__pyx_v_job, __pyx_v_sigfile, 0, NULL); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(1, 207, __pyx_L4_error)
+    __pyx_t_2 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_execute(__pyx_v_job, __pyx_v_sigfile, 0, NULL); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(1, 213, __pyx_L4_error)
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":208
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":214
  *         job = Job.from_ptr(c_job)
  *         job.execute(sigfile)
- *         result = rs_build_hash_table(sig)             # <<<<<<<<<<<<<<
+ *         with nogil:             # <<<<<<<<<<<<<<
+ *             result = rs_build_hash_table(sig)
+ *         if result != RS_DONE:
+ */
+    {
+        #ifdef WITH_THREAD
+        PyThreadState *_save;
+        Py_UNBLOCK_THREADS
+        __Pyx_FastGIL_Remember();
+        #endif
+        /*try:*/ {
+
+          /* "pyrsync/backends/cython/_rsync_cy.pyx":215
+ *         job.execute(sigfile)
+ *         with nogil:
+ *             result = rs_build_hash_table(sig)             # <<<<<<<<<<<<<<
  *         if result != RS_DONE:
  *             raise LibrsyncError(result)
  */
-    __pyx_v_result = rs_build_hash_table(__pyx_v_sig);
+          __pyx_v_result = rs_build_hash_table(__pyx_v_sig);
+        }
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":209
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":214
+ *         job = Job.from_ptr(c_job)
  *         job.execute(sigfile)
- *         result = rs_build_hash_table(sig)
+ *         with nogil:             # <<<<<<<<<<<<<<
+ *             result = rs_build_hash_table(sig)
+ *         if result != RS_DONE:
+ */
+        /*finally:*/ {
+          /*normal exit:*/{
+            #ifdef WITH_THREAD
+            __Pyx_FastGIL_Forget();
+            Py_BLOCK_THREADS
+            #endif
+            goto __pyx_L8;
+          }
+          __pyx_L8:;
+        }
+    }
+
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":216
+ *         with nogil:
+ *             result = rs_build_hash_table(sig)
  *         if result != RS_DONE:             # <<<<<<<<<<<<<<
  *             raise LibrsyncError(result)
- *         c_job = rs_delta_begin(sig)
+ *         with nogil:
  */
     __pyx_t_3 = ((__pyx_v_result != RS_DONE) != 0);
     if (unlikely(__pyx_t_3)) {
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":210
- *         result = rs_build_hash_table(sig)
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":217
+ *             result = rs_build_hash_table(sig)
  *         if result != RS_DONE:
  *             raise LibrsyncError(result)             # <<<<<<<<<<<<<<
- *         c_job = rs_delta_begin(sig)
- *         job = Job.from_ptr(c_job)
+ *         with nogil:
+ *             c_job = rs_delta_begin(sig)
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_LibrsyncError); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 210, __pyx_L4_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_LibrsyncError); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 217, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_5 = __Pyx_PyInt_From_rs_result(__pyx_v_result); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 210, __pyx_L4_error)
+      __pyx_t_5 = __Pyx_PyInt_From_rs_result(__pyx_v_result); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 217, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_t_6 = NULL;
       if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -4851,45 +4991,80 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_del
       __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_6, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 210, __pyx_L4_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 217, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_Raise(__pyx_t_1, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __PYX_ERR(1, 210, __pyx_L4_error)
+      __PYX_ERR(1, 217, __pyx_L4_error)
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":209
- *         job.execute(sigfile)
- *         result = rs_build_hash_table(sig)
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":216
+ *         with nogil:
+ *             result = rs_build_hash_table(sig)
  *         if result != RS_DONE:             # <<<<<<<<<<<<<<
  *             raise LibrsyncError(result)
- *         c_job = rs_delta_begin(sig)
+ *         with nogil:
  */
     }
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":211
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":218
  *         if result != RS_DONE:
  *             raise LibrsyncError(result)
- *         c_job = rs_delta_begin(sig)             # <<<<<<<<<<<<<<
+ *         with nogil:             # <<<<<<<<<<<<<<
+ *             c_job = rs_delta_begin(sig)
+ *         job = Job.from_ptr(c_job)
+ */
+    {
+        #ifdef WITH_THREAD
+        PyThreadState *_save;
+        Py_UNBLOCK_THREADS
+        __Pyx_FastGIL_Remember();
+        #endif
+        /*try:*/ {
+
+          /* "pyrsync/backends/cython/_rsync_cy.pyx":219
+ *             raise LibrsyncError(result)
+ *         with nogil:
+ *             c_job = rs_delta_begin(sig)             # <<<<<<<<<<<<<<
  *         job = Job.from_ptr(c_job)
  *         return job.execute(input, output)
  */
-    __pyx_v_c_job = rs_delta_begin(__pyx_v_sig);
+          __pyx_v_c_job = rs_delta_begin(__pyx_v_sig);
+        }
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":212
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":218
+ *         if result != RS_DONE:
  *             raise LibrsyncError(result)
- *         c_job = rs_delta_begin(sig)
+ *         with nogil:             # <<<<<<<<<<<<<<
+ *             c_job = rs_delta_begin(sig)
+ *         job = Job.from_ptr(c_job)
+ */
+        /*finally:*/ {
+          /*normal exit:*/{
+            #ifdef WITH_THREAD
+            __Pyx_FastGIL_Forget();
+            Py_BLOCK_THREADS
+            #endif
+            goto __pyx_L12;
+          }
+          __pyx_L12:;
+        }
+    }
+
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":220
+ *         with nogil:
+ *             c_job = rs_delta_begin(sig)
  *         job = Job.from_ptr(c_job)             # <<<<<<<<<<<<<<
  *         return job.execute(input, output)
  *     finally:
  */
-    __pyx_t_1 = ((PyObject *)__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_from_ptr(__pyx_v_c_job)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 212, __pyx_L4_error)
+    __pyx_t_1 = ((PyObject *)__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_from_ptr(__pyx_v_c_job)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 220, __pyx_L4_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF_SET(__pyx_v_job, ((struct __pyx_obj_7pyrsync_8backends_6cython_9_rsync_cy_Job *)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":213
- *         c_job = rs_delta_begin(sig)
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":221
+ *             c_job = rs_delta_begin(sig)
  *         job = Job.from_ptr(c_job)
  *         return job.execute(input, output)             # <<<<<<<<<<<<<<
  *     finally:
@@ -4898,15 +5073,15 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_del
     __Pyx_XDECREF(__pyx_r);
     __pyx_t_7.__pyx_n = 1;
     __pyx_t_7.output = __pyx_v_output;
-    __pyx_t_2 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_execute(__pyx_v_job, __pyx_v_input, 0, &__pyx_t_7); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(1, 213, __pyx_L4_error)
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 213, __pyx_L4_error)
+    __pyx_t_2 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_execute(__pyx_v_job, __pyx_v_input, 0, &__pyx_t_7); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(1, 221, __pyx_L4_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 221, __pyx_L4_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_r = __pyx_t_1;
     __pyx_t_1 = 0;
     goto __pyx_L3_return;
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":215
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":223
  *         return job.execute(input, output)
  *     finally:
  *         rs_free_sumset(sig)             # <<<<<<<<<<<<<<
@@ -4959,7 +5134,7 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_del
     }
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":191
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":197
  *     job.execute(input, output)
  * 
  * cpdef inline delta(object input, object sigfile, object output):             # <<<<<<<<<<<<<<
@@ -5020,17 +5195,17 @@ static PyObject *__pyx_pw_7pyrsync_8backends_6cython_9_rsync_cy_5delta(PyObject 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sigfile)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("delta", 1, 3, 3, 1); __PYX_ERR(1, 191, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("delta", 1, 3, 3, 1); __PYX_ERR(1, 197, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_output)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("delta", 1, 3, 3, 2); __PYX_ERR(1, 191, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("delta", 1, 3, 3, 2); __PYX_ERR(1, 197, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "delta") < 0)) __PYX_ERR(1, 191, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "delta") < 0)) __PYX_ERR(1, 197, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -5045,7 +5220,7 @@ static PyObject *__pyx_pw_7pyrsync_8backends_6cython_9_rsync_cy_5delta(PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("delta", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 191, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("delta", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 197, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pyrsync.backends.cython._rsync_cy.delta", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5067,7 +5242,7 @@ static PyObject *__pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_4delta(CYTHON_UN
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("delta", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_delta(__pyx_v_input, __pyx_v_sigfile, __pyx_v_output, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 191, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_delta(__pyx_v_input, __pyx_v_sigfile, __pyx_v_output, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5084,7 +5259,7 @@ static PyObject *__pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_4delta(CYTHON_UN
   return __pyx_r;
 }
 
-/* "pyrsync/backends/cython/_rsync_cy.pyx":222
+/* "pyrsync/backends/cython/_rsync_cy.pyx":230
  *     Py_ssize_t len
  * 
  * cdef rs_result read_cb(void *opaque, rs_long_t pos, size_t *len, void ** buf) with gil:             # <<<<<<<<<<<<<<
@@ -5114,7 +5289,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
   #endif
   __Pyx_RefNannySetupContext("read_cb", 0);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":223
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":231
  * 
  * cdef rs_result read_cb(void *opaque, rs_long_t pos, size_t *len, void ** buf) with gil:
  *     cdef  input_args* args = <input_args*>opaque             # <<<<<<<<<<<<<<
@@ -5123,7 +5298,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
  */
   __pyx_v_args = ((struct __pyx_t_7pyrsync_8backends_6cython_9_rsync_cy_input_args *)__pyx_v_opaque);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":224
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":232
  * cdef rs_result read_cb(void *opaque, rs_long_t pos, size_t *len, void ** buf) with gil:
  *     cdef  input_args* args = <input_args*>opaque
  *     input = <object>args.file             # <<<<<<<<<<<<<<
@@ -5135,16 +5310,16 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
   __pyx_v_input = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":225
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":233
  *     cdef  input_args* args = <input_args*>opaque
  *     input = <object>args.file
  *     input.seek(pos)             # <<<<<<<<<<<<<<
  *     block = input.read(len[0]) # type: bytes
  *     cdef Py_ssize_t block_size = PyBytes_GET_SIZE(block)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_input, __pyx_n_s_seek); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 225, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_input, __pyx_n_s_seek); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_intmax_t(__pyx_v_pos); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 225, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_intmax_t(__pyx_v_pos); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5159,21 +5334,21 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 225, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":226
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":234
  *     input = <object>args.file
  *     input.seek(pos)
  *     block = input.read(len[0]) # type: bytes             # <<<<<<<<<<<<<<
  *     cdef Py_ssize_t block_size = PyBytes_GET_SIZE(block)
  *     cdef void* temp
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_input, __pyx_n_s_read); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 226, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_input, __pyx_n_s_read); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_FromSize_t((__pyx_v_len[0])); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 226, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_FromSize_t((__pyx_v_len[0])); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5188,13 +5363,13 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 226, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_block = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":227
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":235
  *     input.seek(pos)
  *     block = input.read(len[0]) # type: bytes
  *     cdef Py_ssize_t block_size = PyBytes_GET_SIZE(block)             # <<<<<<<<<<<<<<
@@ -5203,7 +5378,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
  */
   __pyx_v_block_size = PyBytes_GET_SIZE(__pyx_v_block);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":229
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":237
  *     cdef Py_ssize_t block_size = PyBytes_GET_SIZE(block)
  *     cdef void* temp
  *     if block_size > args.len:             # <<<<<<<<<<<<<<
@@ -5213,7 +5388,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
   __pyx_t_5 = ((__pyx_v_block_size > __pyx_v_args->len) != 0);
   if (__pyx_t_5) {
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":230
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":238
  *     cdef void* temp
  *     if block_size > args.len:
  *         temp = PyMem_Realloc(<void*>args.buffer, <size_t>block_size)             # <<<<<<<<<<<<<<
@@ -5222,7 +5397,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
  */
     __pyx_v_temp = PyMem_Realloc(((void *)__pyx_v_args->buffer), ((size_t)__pyx_v_block_size));
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":231
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":239
  *     if block_size > args.len:
  *         temp = PyMem_Realloc(<void*>args.buffer, <size_t>block_size)
  *         if temp==NULL:             # <<<<<<<<<<<<<<
@@ -5232,16 +5407,16 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
     __pyx_t_5 = ((__pyx_v_temp == NULL) != 0);
     if (unlikely(__pyx_t_5)) {
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":232
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":240
  *         temp = PyMem_Realloc(<void*>args.buffer, <size_t>block_size)
  *         if temp==NULL:
  *             raise             # <<<<<<<<<<<<<<
  *         args.buffer = <char*>temp
  *         args.len = block_size
  */
-      __Pyx_ReraiseException(); __PYX_ERR(1, 232, __pyx_L1_error)
+      __Pyx_ReraiseException(); __PYX_ERR(1, 240, __pyx_L1_error)
 
-      /* "pyrsync/backends/cython/_rsync_cy.pyx":231
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":239
  *     if block_size > args.len:
  *         temp = PyMem_Realloc(<void*>args.buffer, <size_t>block_size)
  *         if temp==NULL:             # <<<<<<<<<<<<<<
@@ -5250,7 +5425,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
  */
     }
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":233
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":241
  *         if temp==NULL:
  *             raise
  *         args.buffer = <char*>temp             # <<<<<<<<<<<<<<
@@ -5259,7 +5434,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
  */
     __pyx_v_args->buffer = ((char *)__pyx_v_temp);
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":234
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":242
  *             raise
  *         args.buffer = <char*>temp
  *         args.len = block_size             # <<<<<<<<<<<<<<
@@ -5268,7 +5443,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
  */
     __pyx_v_args->len = __pyx_v_block_size;
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":229
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":237
  *     cdef Py_ssize_t block_size = PyBytes_GET_SIZE(block)
  *     cdef void* temp
  *     if block_size > args.len:             # <<<<<<<<<<<<<<
@@ -5277,7 +5452,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
  */
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":236
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":244
  *         args.len = block_size
  * 
  *     len[0] = <size_t>block_size             # <<<<<<<<<<<<<<
@@ -5286,7 +5461,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
  */
   (__pyx_v_len[0]) = ((size_t)__pyx_v_block_size);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":237
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":245
  * 
  *     len[0] = <size_t>block_size
  *     memcpy(args.buffer, PyBytes_AS_STRING(block), <size_t>block_size)             # <<<<<<<<<<<<<<
@@ -5295,7 +5470,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
  */
   (void)(memcpy(__pyx_v_args->buffer, PyBytes_AS_STRING(__pyx_v_block), ((size_t)__pyx_v_block_size)));
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":238
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":246
  *     len[0] = <size_t>block_size
  *     memcpy(args.buffer, PyBytes_AS_STRING(block), <size_t>block_size)
  *     (<char**> buf)[0] = args.buffer             # <<<<<<<<<<<<<<
@@ -5305,7 +5480,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
   __pyx_t_6 = __pyx_v_args->buffer;
   (((char **)__pyx_v_buf)[0]) = __pyx_t_6;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":239
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":247
  *     memcpy(args.buffer, PyBytes_AS_STRING(block), <size_t>block_size)
  *     (<char**> buf)[0] = args.buffer
  *     return RS_DONE             # <<<<<<<<<<<<<<
@@ -5315,7 +5490,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
   __pyx_r = RS_DONE;
   goto __pyx_L0;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":222
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":230
  *     Py_ssize_t len
  * 
  * cdef rs_result read_cb(void *opaque, rs_long_t pos, size_t *len, void ** buf) with gil:             # <<<<<<<<<<<<<<
@@ -5341,7 +5516,7 @@ static rs_result __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb(void *__p
   return __pyx_r;
 }
 
-/* "pyrsync/backends/cython/_rsync_cy.pyx":242
+/* "pyrsync/backends/cython/_rsync_cy.pyx":250
  * 
  * 
  * cpdef inline patch(object input, object delta, object output):             # <<<<<<<<<<<<<<
@@ -5372,7 +5547,7 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_pat
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("patch", 0);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":252
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":260
  *     """
  *     cdef input_args args
  *     args.file= <PyObject *>input             # <<<<<<<<<<<<<<
@@ -5381,47 +5556,82 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_pat
  */
   __pyx_v_args.file = ((PyObject *)__pyx_v_input);
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":253
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":261
  *     cdef input_args args
  *     args.file= <PyObject *>input
  *     args.buffer = NULL             # <<<<<<<<<<<<<<
  *     args.len = 0
- * 
+ *     cdef rs_job_t * c_job
  */
   __pyx_v_args.buffer = NULL;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":254
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":262
  *     args.file= <PyObject *>input
  *     args.buffer = NULL
  *     args.len = 0             # <<<<<<<<<<<<<<
- * 
- *     cdef rs_job_t * c_job = rs_patch_begin(read_cb, <void*>&args)
+ *     cdef rs_job_t * c_job
+ *     with nogil:
  */
   __pyx_v_args.len = 0;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":256
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":264
  *     args.len = 0
- * 
- *     cdef rs_job_t * c_job = rs_patch_begin(read_cb, <void*>&args)             # <<<<<<<<<<<<<<
+ *     cdef rs_job_t * c_job
+ *     with nogil:             # <<<<<<<<<<<<<<
+ *         c_job = rs_patch_begin(read_cb, <void*>&args)
+ *     cdef Job job = Job.from_ptr(c_job)
+ */
+  {
+      #ifdef WITH_THREAD
+      PyThreadState *_save;
+      Py_UNBLOCK_THREADS
+      __Pyx_FastGIL_Remember();
+      #endif
+      /*try:*/ {
+
+        /* "pyrsync/backends/cython/_rsync_cy.pyx":265
+ *     cdef rs_job_t * c_job
+ *     with nogil:
+ *         c_job = rs_patch_begin(read_cb, <void*>&args)             # <<<<<<<<<<<<<<
  *     cdef Job job = Job.from_ptr(c_job)
  *     try:
  */
-  __pyx_v_c_job = rs_patch_begin(__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb, ((void *)(&__pyx_v_args)));
+        __pyx_v_c_job = rs_patch_begin(__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_read_cb, ((void *)(&__pyx_v_args)));
+      }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":257
- * 
- *     cdef rs_job_t * c_job = rs_patch_begin(read_cb, <void*>&args)
+      /* "pyrsync/backends/cython/_rsync_cy.pyx":264
+ *     args.len = 0
+ *     cdef rs_job_t * c_job
+ *     with nogil:             # <<<<<<<<<<<<<<
+ *         c_job = rs_patch_begin(read_cb, <void*>&args)
+ *     cdef Job job = Job.from_ptr(c_job)
+ */
+      /*finally:*/ {
+        /*normal exit:*/{
+          #ifdef WITH_THREAD
+          __Pyx_FastGIL_Forget();
+          Py_BLOCK_THREADS
+          #endif
+          goto __pyx_L5;
+        }
+        __pyx_L5:;
+      }
+  }
+
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":266
+ *     with nogil:
+ *         c_job = rs_patch_begin(read_cb, <void*>&args)
  *     cdef Job job = Job.from_ptr(c_job)             # <<<<<<<<<<<<<<
  *     try:
  *         job.execute(delta, output)
  */
-  __pyx_t_1 = ((PyObject *)__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_from_ptr(__pyx_v_c_job)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 257, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_from_ptr(__pyx_v_c_job)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 266, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_job = ((struct __pyx_obj_7pyrsync_8backends_6cython_9_rsync_cy_Job *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":258
- *     cdef rs_job_t * c_job = rs_patch_begin(read_cb, <void*>&args)
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":267
+ *         c_job = rs_patch_begin(read_cb, <void*>&args)
  *     cdef Job job = Job.from_ptr(c_job)
  *     try:             # <<<<<<<<<<<<<<
  *         job.execute(delta, output)
@@ -5429,7 +5639,7 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_pat
  */
   /*try:*/ {
 
-    /* "pyrsync/backends/cython/_rsync_cy.pyx":259
+    /* "pyrsync/backends/cython/_rsync_cy.pyx":268
  *     cdef Job job = Job.from_ptr(c_job)
  *     try:
  *         job.execute(delta, output)             # <<<<<<<<<<<<<<
@@ -5438,10 +5648,10 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_pat
  */
     __pyx_t_3.__pyx_n = 1;
     __pyx_t_3.output = __pyx_v_output;
-    __pyx_t_2 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_execute(__pyx_v_job, __pyx_v_delta, 0, &__pyx_t_3); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(1, 259, __pyx_L4_error)
+    __pyx_t_2 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_3Job_execute(__pyx_v_job, __pyx_v_delta, 0, &__pyx_t_3); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(1, 268, __pyx_L7_error)
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":261
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":270
  *         job.execute(delta, output)
  *     finally:
  *         PyMem_Free(args.buffer)             # <<<<<<<<<<<<<<
@@ -5449,9 +5659,9 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_pat
   /*finally:*/ {
     /*normal exit:*/{
       PyMem_Free(__pyx_v_args.buffer);
-      goto __pyx_L5;
+      goto __pyx_L8;
     }
-    __pyx_L4_error:;
+    __pyx_L7_error:;
     /*exception exit:*/{
       __Pyx_PyThreadState_declare
       __Pyx_PyThreadState_assign
@@ -5483,10 +5693,10 @@ static CYTHON_INLINE PyObject *__pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_pat
       __pyx_lineno = __pyx_t_2; __pyx_clineno = __pyx_t_4; __pyx_filename = __pyx_t_5;
       goto __pyx_L1_error;
     }
-    __pyx_L5:;
+    __pyx_L8:;
   }
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":242
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":250
  * 
  * 
  * cpdef inline patch(object input, object delta, object output):             # <<<<<<<<<<<<<<
@@ -5546,17 +5756,17 @@ static PyObject *__pyx_pw_7pyrsync_8backends_6cython_9_rsync_cy_7patch(PyObject 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_delta)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("patch", 1, 3, 3, 1); __PYX_ERR(1, 242, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("patch", 1, 3, 3, 1); __PYX_ERR(1, 250, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_output)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("patch", 1, 3, 3, 2); __PYX_ERR(1, 242, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("patch", 1, 3, 3, 2); __PYX_ERR(1, 250, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "patch") < 0)) __PYX_ERR(1, 242, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "patch") < 0)) __PYX_ERR(1, 250, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -5571,7 +5781,7 @@ static PyObject *__pyx_pw_7pyrsync_8backends_6cython_9_rsync_cy_7patch(PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("patch", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 242, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("patch", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 250, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("pyrsync.backends.cython._rsync_cy.patch", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5593,7 +5803,7 @@ static PyObject *__pyx_pf_7pyrsync_8backends_6cython_9_rsync_cy_6patch(CYTHON_UN
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("patch", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_patch(__pyx_v_input, __pyx_v_delta, __pyx_v_output, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 242, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_7pyrsync_8backends_6cython_9_rsync_cy_patch(__pyx_v_input, __pyx_v_delta, __pyx_v_output, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 250, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6463,7 +6673,7 @@ if (!__Pyx_RefNanny) {
  */
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_RS_JOB_BLOCKSIZE, __pyx_int_65535) < 0) __PYX_ERR(1, 27, __pyx_L1_error)
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":176
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":180
  * 
  * cpdef inline signature(object input, object output, size_t strong_len, rs_magic_number sig_magic,
  *                            size_t block_size=RS_DEFAULT_BLOCK_LEN):             # <<<<<<<<<<<<<<
@@ -6472,7 +6682,7 @@ if (!__Pyx_RefNanny) {
  */
   __pyx_k__5 = RS_DEFAULT_BLOCK_LEN;
 
-  /* "pyrsync/backends/cython/_rsync_cy.pyx":175
+  /* "pyrsync/backends/cython/_rsync_cy.pyx":179
  *     return magic, block_len, strong_len
  * 
  * cpdef inline signature(object input, object output, size_t strong_len, rs_magic_number sig_magic,             # <<<<<<<<<<<<<<
