@@ -3,12 +3,18 @@
 /* BEGIN: Cython Metadata
 {
     "distutils": {
+        "define_macros": [
+            [
+                "rsync_EXPORTS",
+                null
+            ]
+        ],
         "depends": [
-            "dep\\src\\job.h",
-            "dep\\src\\librsync.h"
+            "dep/src/job.h",
+            "dep/src/librsync.h"
         ],
         "extra_objects": [
-            "F:\\pyproject\\pyrsync\\dep\\Debug\\rsync.lib"
+            "./dep/librsync.so"
         ],
         "include_dirs": [
             "./dep/src",
@@ -933,7 +939,7 @@ static const char *__pyx_filename;
 
 static const char *__pyx_f[] = {
   "stringsource",
-  "pyrsync\\backends\\cython\\_rsync_cy.pyx",
+  "pyrsync/backends/cython/_rsync_cy.pyx",
   "type.pxd",
 };
 /* NoFastGil.proto */
@@ -1681,7 +1687,7 @@ static const char __pyx_k_self_job_cannot_be_converted_to[] = "self.job cannot b
 static const char __pyx_k_pyrsync_backends_cython__rsync_c[] = "pyrsync.backends.cython._rsync_cy";
 static const char __pyx_k_self_state_cannot_be_converted_t[] = "self.state cannot be converted to a Python object for pickling";
 static const char __pyx_k_sigfile_except_a_file_like_objec[] = "sigfile except a file-like object, got %s";
-static const char __pyx_k_pyrsync_backends_cython__rsync_c_2[] = "pyrsync\\backends\\cython\\_rsync_cy.pyx";
+static const char __pyx_k_pyrsync_backends_cython__rsync_c_2[] = "pyrsync/backends/cython/_rsync_cy.pyx";
 static PyObject *__pyx_n_s_Job;
 static PyObject *__pyx_n_s_LibrsyncError;
 static PyObject *__pyx_n_s_LibrsyncError___init;
