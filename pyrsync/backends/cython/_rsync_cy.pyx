@@ -8,12 +8,22 @@ from cpython.object cimport PyObject, PyObject_HasAttrString
 from libc.stdint cimport uint8_t
 from libc.string cimport memcpy
 
-from pyrsync.backends.cython.rsync cimport (RS_BAD_MAGIC, RS_BLOCKED,
-                                            RS_CORRUPT, RS_DEFAULT_BLOCK_LEN,
-                                            RS_DONE, RS_INPUT_ENDED,
-                                            RS_INTERNAL_ERROR, RS_IO_ERROR,
-                                            RS_MEM_ERROR, RS_PARAM_ERROR,
-                                            RS_RUNNING, RS_SYNTAX_ERROR,
+from pyrsync.backends.cython.rsync cimport RS_BAD_MAGIC
+from pyrsync.backends.cython.\
+    rsync cimport RS_BLAKE2_SIG_MAGIC as C_RS_BLAKE2_SIG_MAGIC
+from pyrsync.backends.cython.rsync cimport (RS_BLOCKED, RS_CORRUPT,
+                                            RS_DEFAULT_BLOCK_LEN)
+from pyrsync.backends.cython.rsync cimport RS_DELTA_MAGIC as C_RS_DELTA_MAGIC
+from pyrsync.backends.cython.rsync cimport (RS_DONE, RS_INPUT_ENDED,
+                                            RS_INTERNAL_ERROR, RS_IO_ERROR)
+from pyrsync.backends.cython.\
+    rsync cimport RS_MD4_SIG_MAGIC as C_RS_MD4_SIG_MAGIC
+from pyrsync.backends.cython.rsync cimport RS_MEM_ERROR, RS_PARAM_ERROR
+from pyrsync.backends.cython.\
+    rsync cimport RS_RK_BLAKE2_SIG_MAGIC as C_RS_RK_BLAKE2_SIG_MAGIC
+from pyrsync.backends.cython.\
+    rsync cimport RS_RK_MD4_SIG_MAGIC as C_RS_RK_MD4_SIG_MAGIC
+from pyrsync.backends.cython.rsync cimport (RS_RUNNING, RS_SYNTAX_ERROR,
                                             RS_TEST_SKIPPED, RS_UNIMPLEMENTED,
                                             rs_buffers_t, rs_build_hash_table,
                                             rs_delta_begin, rs_free_sumset,
@@ -56,6 +66,12 @@ class LibrsyncError(Exception):
 
 
 RS_JOB_BLOCKSIZE = 65535
+
+RS_DELTA_MAGIC = C_RS_DELTA_MAGIC
+RS_MD4_SIG_MAGIC = C_RS_MD4_SIG_MAGIC
+RS_BLAKE2_SIG_MAGIC = C_RS_BLAKE2_SIG_MAGIC
+RS_RK_MD4_SIG_MAGIC = C_RS_RK_MD4_SIG_MAGIC
+RS_RK_BLAKE2_SIG_MAGIC= C_RS_RK_BLAKE2_SIG_MAGIC
 
 cdef inline uint8_t PyFile_Check(object file):
     if PyObject_HasAttrString(file, "read") and PyObject_HasAttrString(file, "write") and PyObject_HasAttrString(file,
@@ -200,8 +216,11 @@ cdef class Job:
             rs_job_free(self.job)
         self.job = NULL
 
-cpdef inline tuple get_signature_args(rs_long_t old_fsize, rs_magic_number magic, size_t block_len, size_t strong_len):
-    cdef rs_result result
+cpdef inline tuple get_signature_args(rs_long_t old_fsize):
+    cdef:
+        rs_result result
+        rs_magic_number magic
+        size_t block_len, strong_len
     with nogil:
         result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
     if result != RS_DONE:

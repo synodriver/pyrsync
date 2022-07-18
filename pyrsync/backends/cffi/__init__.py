@@ -35,6 +35,12 @@ class LibrsyncError(Exception):
 
 RS_JOB_BLOCKSIZE = 65535
 
+RS_DELTA_MAGIC = lib.RS_DELTA_MAGIC
+RS_MD4_SIG_MAGIC = lib.RS_MD4_SIG_MAGIC
+RS_BLAKE2_SIG_MAGIC = lib.RS_BLAKE2_SIG_MAGIC
+RS_RK_MD4_SIG_MAGIC = lib.RS_RK_MD4_SIG_MAGIC
+RS_RK_BLAKE2_SIG_MAGIC = lib.RS_RK_BLAKE2_SIG_MAGIC
+
 
 def PyFile_Check(file) -> bool:
     if hasattr(file, "read") and hasattr(file, "write") and hasattr(file, "seek"):
@@ -183,13 +189,10 @@ class Job:
         self.job = ffi.NULL
 
 
-def get_signature_args(
-    old_fsize: int, magic: int, block_len: int, strong_len: int
-) -> tuple:
-    # cdef rs_result result
-    magic = ffi.new("rs_magic_number*", magic)
-    block_len = ffi.new("size_t*", block_len)
-    strong_len = ffi.new("size_t*", strong_len)
+def get_signature_args(old_fsize: int) -> tuple:
+    magic = ffi.new("rs_magic_number*")
+    block_len = ffi.new("size_t*")
+    strong_len = ffi.new("size_t*")
     result = lib.rs_sig_args(old_fsize, magic, block_len, strong_len)
     if result != lib.RS_DONE:
         raise LibrsyncError(result)

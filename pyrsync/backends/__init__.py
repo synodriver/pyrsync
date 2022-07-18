@@ -18,6 +18,26 @@ def _should_use_cffi() -> bool:
 
 
 if not _should_use_cffi():
-    from pyrsync.backends.cython import delta, get_signature_args, patch, signature
+    from pyrsync.backends.cython import (
+        RS_BLAKE2_SIG_MAGIC,
+        RS_DELTA_MAGIC,
+        RS_MD4_SIG_MAGIC,
+        RS_RK_BLAKE2_SIG_MAGIC,
+        RS_RK_MD4_SIG_MAGIC,
+        delta,
+        get_signature_args,
+        patch,
+        signature,
+    )
 else:
-    from pyrsync.backends.cffi import delta, get_signature_args, patch, signature
+    from pyrsync.backends.cffi import (
+        RS_BLAKE2_SIG_MAGIC,
+        RS_DELTA_MAGIC,
+        RS_MD4_SIG_MAGIC,
+        RS_RK_BLAKE2_SIG_MAGIC,
+        RS_RK_MD4_SIG_MAGIC,
+        delta,
+        get_signature_args,
+        patch,
+        signature,
+    )
