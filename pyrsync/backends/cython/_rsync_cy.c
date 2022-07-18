@@ -3,15 +3,12 @@
 /* BEGIN: Cython Metadata
 {
     "distutils": {
-        "define_macros": [
-            [
-                "rsync_EXPORTS",
-                null
-            ]
-        ],
         "depends": [
             "dep\\src\\job.h",
             "dep\\src\\librsync.h"
+        ],
+        "extra_objects": [
+            "F:\\pyproject\\pyrsync\\dep\\Debug\\rsync.lib"
         ],
         "include_dirs": [
             "./dep/src",
@@ -19,36 +16,7 @@
         ],
         "name": "pyrsync.backends.cython._rsync_cy",
         "sources": [
-            "pyrsync/backends/cython/_rsync_cy.pyx",
-            "./dep/src\\base64.c",
-            "./dep/src\\buf.c",
-            "./dep/src\\checksum.c",
-            "./dep/src\\command.c",
-            "./dep/src\\delta.c",
-            "./dep/src\\emit.c",
-            "./dep/src\\fileutil.c",
-            "./dep/src\\hashtable.c",
-            "./dep/src\\hex.c",
-            "./dep/src\\isprefix.c",
-            "./dep/src\\job.c",
-            "./dep/src\\mdfour.c",
-            "./dep/src\\mksum.c",
-            "./dep/src\\msg.c",
-            "./dep/src\\netint.c",
-            "./dep/src\\patch.c",
-            "./dep/src\\prototab.c",
-            "./dep/src\\rabinkarp.c",
-            "./dep/src\\readsums.c",
-            "./dep/src\\rollsum.c",
-            "./dep/src\\scoop.c",
-            "./dep/src\\stats.c",
-            "./dep/src\\sumset.c",
-            "./dep/src\\trace.c",
-            "./dep/src\\tube.c",
-            "./dep/src\\util.c",
-            "./dep/src\\version.c",
-            "./dep/src\\whole.c",
-            "./dep/src\\blake2\\blake2b-ref.c"
+            "pyrsync/backends/cython/_rsync_cy.pyx"
         ]
     },
     "module_name": "pyrsync.backends.cython._rsync_cy"

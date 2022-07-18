@@ -44,6 +44,7 @@ include_dirs = []
 libraries = []
 
 if has_option("--use-lib"):
+    include_dirs.extend(["./dep/src", "./dep/src/blake2"])
     libraries.append("rsync")
 else:
     include_dirs.extend(["./dep/src", "./dep/src/blake2"])
@@ -57,9 +58,10 @@ extensions = [
         "pyrsync.backends.cython._rsync_cy",
         c_src,
         include_dirs=include_dirs,
+        # library_dirs=[r"F:\pyproject\pyrsync\dep\Debug"],
         libraries=libraries,
-        define_macros=[("rsync_EXPORTS", None)]
-        # extra_objects=[r"F:\pyproject\pyrsync\dep\Debug\rsync.dll"],
+        define_macros=[("rsync_EXPORTS", None)],
+        # extra_objects=[r"F:\pyproject\pyrsync\dep\Debug\rsync.lib"],
     ),
 ]
 cffi_modules = ["pyrsync/backends/cffi/build.py:ffibuilder"]
