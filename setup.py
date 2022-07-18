@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import glob
 import os
 import re
 import sys
@@ -42,10 +41,12 @@ class build_ext_compiler_check(build_ext):
 c_src = ["pyrsync/backends/cython/_rsync_cy.pyx"]
 include_dirs = []
 libraries = []
+extra_objects = []
 
 if has_option("--use-lib"):
     include_dirs.extend(["./dep/src", "./dep/src/blake2"])
     libraries.append("rsync")
+    extra_objects.append(r"./dep/librsync.so")
 else:
     include_dirs.extend(["./dep/src", "./dep/src/blake2"])
     for root, dirs, files in os.walk("./dep/src"):
@@ -59,9 +60,9 @@ extensions = [
         c_src,
         include_dirs=include_dirs,
         # library_dirs=[r"F:\pyproject\pyrsync\dep\Debug"],
-        libraries=libraries,
+        # libraries=libraries,
         define_macros=[("rsync_EXPORTS", None)],
-        # extra_objects=[r"F:\pyproject\pyrsync\dep\Debug\rsync.lib"],
+        extra_objects=extra_objects,
     ),
 ]
 cffi_modules = ["pyrsync/backends/cffi/build.py:ffibuilder"]
