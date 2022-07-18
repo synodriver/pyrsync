@@ -1,27 +1,58 @@
 # cython: language_level=3
 # cython: cdivision=True
-from libc.string cimport memcpy
 cimport cython
 from cpython.bytes cimport (PyBytes_AS_STRING, PyBytes_FromStringAndSize,
                             PyBytes_GET_SIZE)
-from cpython.mem cimport PyMem_Free, PyMem_Malloc,  PyMem_Realloc
+from cpython.mem cimport PyMem_Free, PyMem_Malloc, PyMem_Realloc
 from cpython.object cimport PyObject, PyObject_HasAttrString
 from libc.stdint cimport uint8_t
+from libc.string cimport memcpy
 
-from pyrsync.backends.cython.rsync cimport (RS_BLOCKED, RS_DEFAULT_BLOCK_LEN,
-                                            RS_DONE, rs_buffers_t,
-                                            rs_build_hash_table,
-                                            rs_delta_begin, rs_job_free,
-                                            rs_job_iter, rs_job_statistics,
-                                            rs_job_t, rs_loadsig_begin,rs_patch_begin,
-                                            rs_long_t, rs_magic_number,rs_signature_t,rs_free_sumset,
+from pyrsync.backends.cython.rsync cimport (RS_BAD_MAGIC, RS_BLOCKED,
+                                            RS_CORRUPT, RS_DEFAULT_BLOCK_LEN,
+                                            RS_DONE, RS_INPUT_ENDED,
+                                            RS_INTERNAL_ERROR, RS_IO_ERROR,
+                                            RS_MEM_ERROR, RS_PARAM_ERROR,
+                                            RS_RUNNING, RS_SYNTAX_ERROR,
+                                            RS_TEST_SKIPPED, RS_UNIMPLEMENTED,
+                                            rs_buffers_t, rs_build_hash_table,
+                                            rs_delta_begin, rs_free_sumset,
+                                            rs_job_free, rs_job_iter,
+                                            rs_job_statistics, rs_job_t,
+                                            rs_loadsig_begin, rs_long_t,
+                                            rs_magic_number, rs_patch_begin,
                                             rs_result, rs_sig_args,
-                                            rs_sig_begin, rs_stats_t)
+                                            rs_sig_begin, rs_signature_t,
+                                            rs_stats_t)
 
 
 class LibrsyncError(Exception):
     def __init__(self, result):
         self.code = result
+
+    def __str__(self):
+        if self.code == RS_RUNNING:
+            return "RS_RUNNING"
+        elif self.code == RS_TEST_SKIPPED:
+            return "RS_TEST_SKIPPED"
+        elif self.code == RS_IO_ERROR:
+            return "RS_IO_ERROR"
+        elif self.code == RS_SYNTAX_ERROR:
+            return "RS_SYNTAX_ERROR"
+        elif self.code == RS_MEM_ERROR:
+            return "RS_MEM_ERROR"
+        elif self.code == RS_INPUT_ENDED:
+            return "RS_INPUT_ENDED"
+        elif self.code == RS_BAD_MAGIC:
+            return "RS_BAD_MAGIC"
+        elif self.code == RS_UNIMPLEMENTED:
+            return "RS_UNIMPLEMENTED"
+        elif self.code == RS_CORRUPT:
+            return "RS_CORRUPT"
+        elif self.code == RS_INTERNAL_ERROR:
+            return "RS_INTERNAL_ERROR"
+        elif self.code == RS_PARAM_ERROR:
+            return "RS_PARAM_ERROR"
 
 
 RS_JOB_BLOCKSIZE = 65535
@@ -47,6 +78,7 @@ cdef class Stats:
     @property
     def op(self):
         return (<bytes>self.state.op).decode()
+
     @property
     def lit_cmds(self):
         return self.state.lit_cmds

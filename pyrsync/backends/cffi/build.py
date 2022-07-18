@@ -1,9 +1,11 @@
 import os
+
 from cffi import FFI
 
 ffibuilder = FFI()
 
-ffibuilder.cdef(r"""
+ffibuilder.cdef(
+    r"""
 extern char const rs_librsync_version[];
 
 typedef uint8_t rs_byte_t;
@@ -695,7 +697,12 @@ rs_result rs_delta_file(rs_signature_t *, FILE *new_file,
  * \sa \ref api_whole */
 rs_result rs_patch_file(FILE *basis_file, FILE *delta_file,
                                         FILE *new_file, rs_stats_t *);
-""")
+// my event callback
+
+                       
+extern "Python" rs_result read_cb(void *opaque, rs_long_t pos, size_t *len, void ** buf);
+"""
+)
 
 c_src = []
 for root, dirs, files in os.walk("./dep/src"):
@@ -706,6 +713,11 @@ source = """
 #include <time.h>
 #include "job.h"
 #include "librsync.h"
+typedef struct {
+    void *file;
+    char* buffer;
+    size_t len;
+} input_args;
 """
 ffibuilder.set_source(
     "pyrsync.backends.cffi._rsync_cffi",
