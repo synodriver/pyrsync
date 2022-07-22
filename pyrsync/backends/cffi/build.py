@@ -387,7 +387,7 @@ typedef struct weaksum {
         rabinkarp_t rk;
     } sum;
 } weaksum_t;
-typedef rs_result (*rs_copy_cb)(void *opaque, rs_long_t pos, size_t *len,
+typedef rs_result rs_copy_cb(void *opaque, rs_long_t pos, size_t *len_,
                              void **buf);
 struct rs_job {
     int dogtag;
@@ -579,11 +579,11 @@ rs_result rs_build_hash_table(rs_signature_t *sums);
  *
  * \param pos Position where copying should begin.
  *
- * \param len On input, the amount of data that should be retrieved. Updated to
+ * \param len_ On input, the amount of data that should be retrieved. Updated to
  * show how much is actually available, but should not be greater than the
  * input value.
  *
- * \param buf On input, a buffer of at least \p *len bytes. May be updated to
+ * \param buf On input, a buffer of at least \p *len_ bytes. May be updated to
  * point to a buffer allocated by the callback if it prefers. */
 
 
@@ -636,7 +636,7 @@ int rs_file_close(FILE *file);
 rs_long_t rs_file_size(FILE *file);
 
 /** ::rs_copy_cb that reads from a stdio file. */
-rs_result rs_file_copy_cb(void *arg, rs_long_t pos, size_t *len,
+rs_result rs_file_copy_cb(void *arg, rs_long_t pos, size_t *len_,
                                           void **buf);
 
 /** Buffer sizes for file IO.
@@ -697,10 +697,19 @@ rs_result rs_delta_file(rs_signature_t *, FILE *new_file,
  * \sa \ref api_whole */
 rs_result rs_patch_file(FILE *basis_file, FILE *delta_file,
                                         FILE *new_file, rs_stats_t *);
-// my event callback
+                                        
+void* malloc(size_t n);
+void free(void *p);
+void* realloc(void *p, size_t n);
 
+// my event callback
+typedef struct {
+    void *file;
+    char* buffer;
+    size_t len_;
+} input_args;
                        
-extern "Python" rs_result read_cb(void *opaque, rs_long_t pos, size_t *len, void ** buf);
+extern "Python" rs_result read_cb(void *opaque, rs_long_t pos, size_t *len_, void ** buf);
 """
 )
 
@@ -710,20 +719,17 @@ for root, dirs, files in os.walk("./dep/src"):
         if file.endswith(".c") and "rdiff" not in file:
             c_src.append(os.path.join(root, file))
 source = """
+#include <stdlib.h>
 #include <time.h>
 #include "job.h"
 #include "librsync.h"
-typedef struct {
-    void *file;
-    char* buffer;
-    size_t len;
-} input_args;
+#include "cbarg.h"
 """
 ffibuilder.set_source(
     "pyrsync.backends.cffi._rsync_cffi",
     source,
     sources=c_src,
-    include_dirs=["./dep/src", "./dep/src/blake2"],
+    include_dirs=["./dep/src", "./dep/src/blake2", "./pyrsync/backends/cffi"],
     define_macros=[("rsync_EXPORTS", None)],
 )
 

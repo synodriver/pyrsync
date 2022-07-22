@@ -137,7 +137,7 @@ class Job:
         state = lib.rs_job_statistics(self.job)
         return Stats.from_ptr(state)
 
-    def execute(self, input, output=None):
+    def execute(self, input, output=None) -> None:
         if not PyFile_Check(input):
             raise TypeError(
                 "input except a file-like object, got %s" % type(input).__name__
@@ -152,36 +152,33 @@ class Job:
         #     bytes block
         #     rs_result result
         buffer = ffi.new("rs_buffers_t*")
-        out = lib.PyMem_Malloc(RS_JOB_BLOCKSIZE)
+        out = ffi.new("char[]", RS_JOB_BLOCKSIZE)
         if not out:
             raise MemoryError
-        try:
-            while True:
-                block = input.read(RS_JOB_BLOCKSIZE)  # type: bytes
-                buffer.next_in = ffi.from_buffer(block)
-                buffer.avail_in = len(block)
-                buffer.eof_in = bool(block)
-                buffer.next_out = ffi.cast("char*", out)
-                buffer.avail_out = RS_JOB_BLOCKSIZE
-                result = self.iter(buffer)
-                if output is not None:
-                    output.write(
-                        ffi.unpack(
-                            ffi.cast("char*", out), RS_JOB_BLOCKSIZE - buffer.avail_out
-                        )
+        while True:
+            block = input.read(RS_JOB_BLOCKSIZE)  # type: bytes
+            buffer.next_in = ffi.from_buffer(block)
+            buffer.avail_in = len(block)
+            buffer.eof_in = not block
+            buffer.next_out = out
+            buffer.avail_out = RS_JOB_BLOCKSIZE
+            result = self.iter(buffer)
+            if output is not None:
+                output.write(
+                    ffi.unpack(
+                        out, RS_JOB_BLOCKSIZE - buffer.avail_out
                     )
-                if result == lib.RS_DONE:
-                    break
-                elif result != lib.RS_BLOCKED:
-                    raise LibrsyncError(result)
-                if buffer.avail_in > 0:
-                    # There is data left in the input buffer, librsync did not consume
-                    # all of it. Rewind the file a bit so we include that data in our
-                    # next read. It would be better to simply tack data to the end of
-                    # this buffer, but that is very difficult in Python.
-                    input.seek(input.tell() - buffer.avail_in)
-        finally:
-            lib.PyMem_Free(out)
+                )
+            if result == lib.RS_DONE:
+                break
+            elif result != lib.RS_BLOCKED:
+                raise LibrsyncError(result)
+            if buffer.avail_in > 0:
+                # There is data left in the input buffer, librsync did not consume
+                # all of it. Rewind the file a bit so we include that data in our
+                # next read. It would be better to simply tack data to the end of
+                # this buffer, but that is very difficult in Python.
+                input.seek(input.tell() - buffer.avail_in)
 
     def __del__(self):
         if self.job:
@@ -189,14 +186,19 @@ class Job:
         self.job = ffi.NULL
 
 
-def get_signature_args(old_fsize: int) -> tuple:
-    magic = ffi.new("rs_magic_number*")
-    block_len = ffi.new("size_t*")
-    strong_len = ffi.new("size_t*")
-    result = lib.rs_sig_args(old_fsize, magic, block_len, strong_len)
+def get_signature_args(
+    old_fsize: int, magic: int = 0, block_len: int = 0, strong_len: int = 0
+) -> tuple:
+    c_magic = ffi.new("rs_magic_number*")
+    c_magic[0] = magic
+    c_block_len = ffi.new("size_t*")
+    c_block_len[0] = block_len
+    c_strong_len = ffi.new("size_t*")
+    c_strong_len[0] = strong_len
+    result = lib.rs_sig_args(old_fsize, c_magic, c_block_len, c_strong_len)
     if result != lib.RS_DONE:
         raise LibrsyncError(result)
-    return magic[0], block_len[0], strong_len[0]
+    return c_magic[0], c_block_len[0], c_strong_len[0]
 
 
 def signature(
@@ -205,7 +207,7 @@ def signature(
     strong_len: int,
     sig_magic: int,
     block_size: int = lib.RS_DEFAULT_BLOCK_LEN,
-):
+) -> None:
     """
      Generate a signature for the file input. The signature will be written to output.
     You can specify the size of the blocks using the optional `block_size` parameter.
@@ -223,7 +225,7 @@ def signature(
     job.execute(input, output)
 
 
-def delta(input, sigfile, output):
+def delta(input, sigfile, output) -> None:
     """
     Create a delta for the file input using the signature read from sigfile. The delta
     will be written to  output.
@@ -253,20 +255,20 @@ def delta(input, sigfile, output):
 
 
 @ffi.def_extern()
-def read_cb(opaque, pos, len, buf):
+def read_cb(opaque, pos, len_, buf):
     args = ffi.cast("input_args*", opaque)
     input = ffi.from_handle(args.file)
     input.seek(pos)
-    block = input.read(len[0])  # type: bytes
-    block_size: int = len(block)
+    block = input.read(len_[0])  # type: bytes
+    block_size: int = len(block)  # fixme: why block is bytes but can't len_
     if block_size > args.len:
-        temp = lib.PyMem_Realloc(args.buffer, block_size)
+        temp = lib.realloc(args.buffer, block_size)
         if temp == ffi.NULL:
             raise MemoryError
         args.buffer = ffi.cast("char*", temp)
         args.len = block_size
 
-    len[0] = block_size
+    len_[0] = block_size
     ffi.memmove(args.buffer, block, block_size)
     ffi.cast("char**", buf)[0] = args.buffer
     return lib.RS_DONE
@@ -283,7 +285,8 @@ def patch(input, delta, output):
     """
     # cdef input_args args
     args = ffi.new("input_args*")
-    args.file = ffi.new_handle(input)
+    handle = ffi.new_handle(input)  # catch you! keep cdata alive
+    args.file = handle
     args.buffer = ffi.NULL
     args.len = 0
     # cdef rs_job_t * c_job
@@ -292,4 +295,4 @@ def patch(input, delta, output):
     try:
         job.execute(delta, output)
     finally:
-        lib.PyMem_Free(args.buffer)
+        lib.free(args.buffer)

@@ -189,7 +189,7 @@ cdef class Job:
                 block = input.read(RS_JOB_BLOCKSIZE)  # type: bytes
                 buffer.next_in = PyBytes_AS_STRING(block)
                 buffer.avail_in = <size_t> PyBytes_GET_SIZE(block)
-                buffer.eof_in = bool(block)
+                buffer.eof_in = not block
                 buffer.next_out = <char *> out
                 buffer.avail_out = <size_t> RS_JOB_BLOCKSIZE
                 result = self.iter(&buffer)
@@ -216,16 +216,16 @@ cdef class Job:
             rs_job_free(self.job)
         self.job = NULL
 
-cpdef inline tuple get_signature_args(rs_long_t old_fsize):
+cpdef inline tuple get_signature_args(rs_long_t old_fsize, int magic = 0, size_t block_len = 0, size_t strong_len= 0):
     cdef:
         rs_result result
-        rs_magic_number magic
-        size_t block_len, strong_len
+        rs_magic_number c_magic = <rs_magic_number>magic
+        # size_t cblock_len, strong_len
     with nogil:
-        result = rs_sig_args(old_fsize, &magic, &block_len, &strong_len)
+        result = rs_sig_args(old_fsize, &c_magic, &block_len, &strong_len)
     if result != RS_DONE:
         raise LibrsyncError(result)
-    return magic, block_len, strong_len
+    return c_magic, block_len, strong_len
 
 cpdef inline signature(object input, object output, size_t strong_len, rs_magic_number sig_magic,
                            size_t block_size=RS_DEFAULT_BLOCK_LEN):
