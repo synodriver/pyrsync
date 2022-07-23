@@ -1,0 +1,3 @@
+recursive-include pyrsync  *
+recursive-include dep/src  *
+include README.markdown

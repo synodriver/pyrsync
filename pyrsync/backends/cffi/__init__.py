@@ -261,12 +261,12 @@ def read_cb(opaque, pos, len_, buf):
     input.seek(pos)
     block = input.read(len_[0])  # type: bytes
     block_size: int = len(block)  # fixme: why block is bytes but can't len_
-    if block_size > args.len:
+    if block_size > args.len_:
         temp = lib.realloc(args.buffer, block_size)
         if temp == ffi.NULL:
             raise MemoryError
         args.buffer = ffi.cast("char*", temp)
-        args.len = block_size
+        args.len_ = block_size
 
     len_[0] = block_size
     ffi.memmove(args.buffer, block, block_size)
@@ -288,7 +288,7 @@ def patch(input, delta, output):
     handle = ffi.new_handle(input)  # catch you! keep cdata alive
     args.file = handle
     args.buffer = ffi.NULL
-    args.len = 0
+    args.len_ = 0
     # cdef rs_job_t * c_job
     c_job = lib.rs_patch_begin(lib.read_cb, ffi.cast("void*", args))
     job = Job.from_ptr(c_job)

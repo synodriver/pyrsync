@@ -3,6 +3,6 @@
 typedef struct {
     void *file;
     char* buffer;
-    size_t len;
+    size_t len_;
 } input_args;
 #endif

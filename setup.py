@@ -113,7 +113,7 @@ def main():
 
     dis = get_dis()
     setup(
-        name="pyrsync",
+        name="python-rsync",
         version=version,
         url="https://github.com/synodriver/pyrsync",
         packages=packages,

@@ -1,0 +1,44 @@
+name: unitest
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "pypy3.7", "pypy3.8"]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Check out recursively
+      run: git submodule update --init --recursive
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: build librsync
+      run: |
+        cd ./dep
+        cmake .
+        cmake --build . --config RELEASE
+        cd ..
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install --upgrade setuptools
+        python -m pip install --upgrade wheel
+        pip install flake8 pytest
+        pip install cython rsilk
+    - name: build_whl
+      run: |
+        python setup.py install --use-cython --use-cffi
+    - name: Test with unitest
+      run: |
+        cd tests
+        python test_patch.py
+        python test_cffi.py
