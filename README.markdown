@@ -6,8 +6,8 @@
 ![python](https://img.shields.io/pypi/pyversions/python-rsync)
 ![implementation](https://img.shields.io/pypi/implementation/python-rsync)
 ![wheel](https://img.shields.io/pypi/wheel/python-rsync)
-![license](https://img.shields.io/github/license/synodriver/python-rsync.svg)
-![action](https://img.shields.io/github/workflow/status/synodriver/python-rsync/build%20wheel)
+![license](https://img.shields.io/github/license/synodriver/pyrsync.svg)
+![action](https://img.shields.io/github/workflow/status/synodriver/pyrsync/build%20wheel)
 
 ## Install
 ```bash
@@ -63,8 +63,8 @@ def patch(input:IO, delta:IO, output) -> None: ...
 ### Compile
 ```
 python -m pip install setuptools wheel cython cffi
-git clone https://github.com/synodriver/python-rsync
-cd python-rsync
+git clone https://github.com/synodriver/pyrsync
+cd pyrsync
 git submodule update --init --recursive
 python setup.py bdist_wheel --use-cython --use-cffi
 ```
