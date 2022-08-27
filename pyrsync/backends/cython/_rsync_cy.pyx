@@ -170,10 +170,8 @@ cdef class Job:
     cpdef inline int execute(self, object input, object output = None) except -1:
         if not PyFile_Check(input):
             raise TypeError("input except a file-like object, got %s" % type(input).__name__)
-            return -1
         if output is not None and not PyFile_Check(output):
             raise TypeError("sigfile except a file-like object, got %s" % type(output).__name__)
-            return -1
         cdef:
             rs_buffers_t buffer
             void * out  # sigfile buffer
@@ -182,8 +180,7 @@ cdef class Job:
 
         out = PyMem_Malloc(RS_JOB_BLOCKSIZE)
         if not out:
-            raise
-            return -1
+            raise MemoryError
         try:
             while True:
                 block = input.read(RS_JOB_BLOCKSIZE)  # type: bytes
@@ -200,7 +197,6 @@ cdef class Job:
                     break
                 elif result != RS_BLOCKED:
                     raise LibrsyncError(result)
-                    return -1
                 if buffer.avail_in > 0:
                     # There is data left in the input buffer, librsync did not consume
                     # all of it. Rewind the file a bit so we include that data in our
