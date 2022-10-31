@@ -726,7 +726,7 @@ source = """
 #include "cbarg.h"
 """
 ffibuilder.set_source(
-    "pyrsync.backends.cffi._rsync_cffi",
+    "pyrsync.backends.cffi._rsync",
     source,
     sources=c_src,
     include_dirs=["./dep/src", "./dep/src/blake2", "./pyrsync/backends/cffi"],

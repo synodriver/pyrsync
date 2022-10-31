@@ -148,6 +148,7 @@ cdef class Stats:
 @cython.freelist(8)
 @cython.final
 @cython.no_gc
+@cython.internal
 cdef class Job:
     cdef  rs_job_t * job
 
@@ -164,7 +165,7 @@ cdef class Job:
         return result
 
     cpdef inline Stats statistics(self):
-        cdef rs_stats_t * state = rs_job_statistics(self.job)
+        cdef rs_stats_t * state = <rs_stats_t *>rs_job_statistics(self.job)
         return Stats.from_ptr(state)
 
     cpdef inline int execute(self, object input, object output = None) except -1:
@@ -274,7 +275,7 @@ cdef struct input_args:
     char* buffer
     Py_ssize_t len
 
-cdef rs_result read_cb(void *opaque, rs_long_t pos, size_t *len, void ** buf) with gil:
+cdef rs_result read_cb(void *opaque, rs_long_t pos, size_t *len, void ** buf) except * with gil:
     cdef  input_args* args = <input_args*>opaque
     input = <object>args.file
     input.seek(pos)
@@ -284,7 +285,7 @@ cdef rs_result read_cb(void *opaque, rs_long_t pos, size_t *len, void ** buf) wi
     if block_size > args.len:
         temp = PyMem_Realloc(<void*>args.buffer, <size_t>block_size)
         if temp==NULL:
-            raise
+            raise MemoryError
         args.buffer = <char*>temp
         args.len = block_size
 

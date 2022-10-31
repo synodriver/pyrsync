@@ -38,7 +38,7 @@ class build_ext_compiler_check(build_ext):
         super().build_extensions()
 
 
-c_src = ["pyrsync/backends/cython/_rsync_cy.pyx"]
+c_src = ["pyrsync/backends/cython/_rsync.pyx"]
 include_dirs = []
 libraries = []
 extra_objects = []
@@ -56,7 +56,7 @@ else:
 
 extensions = [
     Extension(
-        "pyrsync.backends.cython._rsync_cy",
+        "pyrsync.backends.cython._rsync",
         c_src,
         include_dirs=include_dirs,
         # library_dirs=[r"F:\pyproject\pyrsync\dep\Debug"],

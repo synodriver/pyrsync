@@ -122,7 +122,7 @@ cdef extern from "librsync.h" nogil:
     rs_job_t *rs_loadsig_begin(rs_signature_t **)
     rs_result rs_build_hash_table(rs_signature_t *sums)
     ctypedef rs_result rs_copy_cb(void *opaque, rs_long_t pos, size_t *len,
-                         void ** buf)
+                         void ** buf)  except * with gil
     rs_job_t *rs_patch_begin(rs_copy_cb * copy_cb, void *copy_arg)
     FILE *rs_file_open(char * filename, char  * mode, int force )
     int rs_file_close(FILE *file)

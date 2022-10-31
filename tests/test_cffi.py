@@ -1,3 +1,6 @@
+
+import sys
+sys.path.append(".")
 from io import BytesIO
 from unittest import TestCase
 import os

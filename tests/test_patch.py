@@ -1,3 +1,5 @@
+import sys
+sys.path.append(".")
 from io import BytesIO
 from unittest import TestCase
 
@@ -10,7 +12,7 @@ class TestPatch(TestCase):
 
     def tearDown(self) -> None:
         pass
-
+        
     def test_patch(self):
         s = b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" * 50
         d = b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" * 50 + b"2"
