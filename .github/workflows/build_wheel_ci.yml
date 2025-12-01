@@ -21,7 +21,7 @@ jobs:
       CIBW_ARCHS_LINUX: "x86_64 aarch64 riscv64"
       CIBW_ARCHS_WINDOWS: "AMD64 x86 ARM64"
       CIBW_ARCHS_MACOS: "x86_64 universal2 arm64"
-      CIBW_ENVIRONMENT: USE-CYTHON="1" USE-CFFI="1" 
+      CIBW_ENVIRONMENT: USE-CYTHON="1" USE-CFFI="1" USE-LIB="1"
       CIBW_PROJECT_REQUIRES_PYTHON: ">=3.8"
       CIBW_ENABLE: "cpython-freethreading"
       CIBW_ALLOW_EMPTY: True
