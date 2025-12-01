@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+import glob
 import os
+import platform
 import re
+import shutil
 import sys
 import sysconfig
-import glob
-import shutil
-import platform
 from collections import defaultdict
 
 try:
@@ -44,6 +44,7 @@ elif uname.system == "Darwin":
     ]:
         LINK_ARGS[compiler] = args
 
+
 def has_option(name: str) -> bool:
     if name in sys.argv[1:]:
         sys.argv.remove(name)
@@ -66,20 +67,21 @@ class build_ext_compiler_check(build_ext):
 
 
 c_src = ["pyrsync/backends/cython/_rsync.pyx"]
-include_dirs = []
+include_dirs = ["./dep/src", "./dep/src/blake2"]
 libraries = []
 extra_objects = []
 
 if has_option("--use-lib"):
-    include_dirs.extend(["./dep/src", "./dep/src/blake2"])
     libraries.append("rsync")
-    extra_objects.append(r"./dep/librsync.so")
-    for file in glob.glob("./dep/*.dll"):
-        shutil.copy(file, "./pyrsync/backends/cython")
-    for file in glob.glob("./dep/*.so*"):
-        shutil.copy(file, "./pyrsync/backends/cython")
+    if uname.system == "Windows":
+        extra_objects.append(r"./dep/Release/rsync.lib")
+        for file in glob.glob("./dep/Release/*.dll"):
+            shutil.copy(file, "./pyrsync/backends/cython")
+    else:
+        extra_objects.append(r"./dep/librsync.so")
+        for file in glob.glob("./dep/*.so*"):
+            shutil.copy(file, "./pyrsync/backends/cython")
 else:
-    include_dirs.extend(["./dep/src", "./dep/src/blake2"])
     for root, dirs, files in os.walk("./dep/src"):
         for file in files:
             if file.endswith(".c") and "rdiff" not in file:
@@ -177,12 +179,13 @@ def main():
             "Programming Language :: C",
             "Programming Language :: Cython",
             "Programming Language :: Python",
-            "Programming Language :: Python :: 3.6",
-            "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
             "Programming Language :: Python :: 3.11",
+            "Programming Language :: Python :: 3.12",
+            "Programming Language :: Python :: 3.13",
+            "Programming Language :: Python :: 3.14",
             "Programming Language :: Python :: Implementation :: CPython",
             "Programming Language :: Python :: Implementation :: PyPy",
         ],
