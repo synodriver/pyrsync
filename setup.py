@@ -2,6 +2,10 @@
 import os
 import re
 import sys
+import sysconfig
+import glob
+import shutil
+import platform
 from collections import defaultdict
 
 try:
@@ -14,13 +18,31 @@ from setuptools import Extension, find_packages, setup
 from setuptools.command.build_ext import build_ext
 
 BUILD_ARGS = defaultdict(lambda: ["-O3", "-g0"])
+LINK_ARGS = defaultdict(lambda: [])
 
 for compiler, args in [
     ("msvc", ["/EHsc", "/DHUNSPELL_STATIC", "/Oi", "/O2", "/Ot"]),
     ("gcc", ["-O3", "-g0"]),
+    ("unix", ["-O3", "-g0"]),
 ]:
     BUILD_ARGS[compiler] = args
 
+uname = platform.uname()
+
+# Add rpath for Linux to find shared libraries in the same directory
+if uname.system == "Linux":
+    for compiler, args in [
+        ("gcc", ["-Wl,-rpath,$ORIGIN"]),
+        ("unix", ["-Wl,-rpath,$ORIGIN"]),
+    ]:
+        LINK_ARGS[compiler] = args
+elif uname.system == "Darwin":
+    # macOS uses @loader_path instead of $ORIGIN
+    for compiler, args in [
+        ("gcc", ["-Wl,-rpath,@loader_path"]),
+        ("unix", ["-Wl,-rpath,@loader_path"]),
+    ]:
+        LINK_ARGS[compiler] = args
 
 def has_option(name: str) -> bool:
     if name in sys.argv[1:]:
@@ -35,11 +57,11 @@ def has_option(name: str) -> bool:
 class build_ext_compiler_check(build_ext):
     def build_extensions(self):
         compiler = self.compiler.compiler_type
-        args = BUILD_ARGS[compiler]
+        compile_args = BUILD_ARGS[compiler]
+        link_args = LINK_ARGS[compiler]
         for ext in self.extensions:
-            ext.extra_compile_args = args
-            if os.name == "nt":
-                ext.libraries.append("ws2_32")
+            ext.extra_compile_args.extend(compile_args)
+            ext.extra_link_args.extend(link_args)
         super().build_extensions()
 
 
@@ -52,6 +74,10 @@ if has_option("--use-lib"):
     include_dirs.extend(["./dep/src", "./dep/src/blake2"])
     libraries.append("rsync")
     extra_objects.append(r"./dep/librsync.so")
+    for file in glob.glob("./dep/*.dll"):
+        shutil.copy(file, "./pyrsync/backends/cython")
+    for file in glob.glob("./dep/*.so*"):
+        shutil.copy(file, "./pyrsync/backends/cython")
 else:
     include_dirs.extend(["./dep/src", "./dep/src/blake2"])
     for root, dirs, files in os.walk("./dep/src"):
@@ -60,11 +86,7 @@ else:
                 c_src.append(os.path.join(root, file))
 
 defined_macros = [("rsync_EXPORTS", None)]
-if (
-    sys.version_info > (3, 13, 0)
-    and hasattr(sys, "_is_gil_enabled")
-    and not sys._is_gil_enabled()
-):
+if sysconfig.get_config_var("Py_GIL_DISABLED"):
     print("build nogil")
     defined_macros.append(
         ("Py_GIL_DISABLED", "1"),
