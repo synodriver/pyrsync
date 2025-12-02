@@ -12,12 +12,17 @@ jobs:
         os: [ubuntu-22.04, windows-2022, macos-latest, macos-15-intel]
       fail-fast: false
     env:
-      CIBW_BEFORE_ALL: >
+      # CIBW_BEFORE_ALL: >
+      #   cd ./dep &&
+      #   cmake . &&
+      #   cmake --build . --config RELEASE &&
+      #   cd ..
+      CIBW_BEFORE_BUILD: >
         cd ./dep &&
         cmake . &&
         cmake --build . --config RELEASE &&
-        cd ..
-      CIBW_BEFORE_BUILD: pip install -r requirements.txt
+        cd .. &&
+        pip install -r requirements.txt
       CIBW_ARCHS_LINUX: "x86_64 aarch64 riscv64"
       CIBW_ARCHS_WINDOWS: "AMD64 x86 ARM64"
       CIBW_ARCHS_MACOS: "x86_64 universal2 arm64"
