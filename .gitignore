@@ -15,3 +15,5 @@ lib/
 *.lib
 *.a
 *.so*
+*.egg-info/
+_codeql_detected_source_root
