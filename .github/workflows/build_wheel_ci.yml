@@ -9,24 +9,18 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-22.04, windows-2022, macos-latest, macos-15-intel]
+        os: [ubuntu-22.04, windows-2022, macos-latest, macos-13]
       fail-fast: false
     env:
-      # CIBW_BEFORE_ALL: >
-      #   cd ./dep &&
-      #   cmake . &&
-      #   cmake --build . --config RELEASE &&
-      #   cd ..
       CIBW_BEFORE_BUILD: >
         cd ./dep &&
         cmake . &&
-        cmake --build . --config RELEASE &&
         cd .. &&
         pip install -r requirements.txt
-      CIBW_ARCHS_LINUX: "x86_64 aarch64 riscv64"
+      CIBW_ARCHS_LINUX: "x86_64 aarch64"
       CIBW_ARCHS_WINDOWS: "AMD64 x86 ARM64"
-      CIBW_ARCHS_MACOS: "x86_64 universal2 arm64"
-      CIBW_ENVIRONMENT: USE-CYTHON="1" USE-CFFI="1" USE-LIB="1"
+      CIBW_ARCHS_MACOS: "x86_64 arm64"
+      CIBW_ENVIRONMENT: USE-CYTHON="1" USE-CFFI="1"
       CIBW_PROJECT_REQUIRES_PYTHON: ">=3.8"
       CIBW_ENABLE: "cpython-freethreading"
       CIBW_ALLOW_EMPTY: True

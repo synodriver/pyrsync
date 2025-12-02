@@ -77,6 +77,11 @@ if has_option("--use-lib"):
         extra_objects.append(r"./dep/Release/rsync.lib")
         for file in glob.glob("./dep/Release/*.dll"):
             shutil.copy(file, "./pyrsync/backends/cython")
+    elif uname.system == "Darwin":
+        # macOS uses .dylib extension
+        extra_objects.append(r"./dep/librsync.dylib")
+        for file in glob.glob("./dep/*.dylib*"):
+            shutil.copy(file, "./pyrsync/backends/cython")
     else:
         extra_objects.append(r"./dep/librsync.so")
         for file in glob.glob("./dep/*.so*"):
